@@ -1,0 +1,82 @@
+/* ============================================================
+   THIRD BIOME — v3 "Clean Athletic" theme
+   A bright, photography-forward, conversion-led system.
+   Departure from the v1/v2 scrapbook look.
+   ============================================================ */
+/* Editorial serif (Zodiak) for headlines + Satoshi workhorse sans for body,
+   per brand guidelines. Zodiak/Satoshi stand in for PP Editorial New / PP
+   Object Sans pending licensing. */
+@import url('https://api.fontshare.com/v2/css?f[]=zodiak@400,700&f[]=satoshi@400,500,700,900&f[]=clash-display@600,700&display=swap');
+
+:root{
+  /* Surfaces — light & airy */
+  --paper:   #faf8f3;   /* warm off-white base */
+  --white:   #ffffff;
+  --sand:    #f0ebe0;   /* subtle warm section */
+  --mist:    #eef1ee;   /* cool light section */
+
+  /* Brand */
+  --emerald:   #109648;  /* vivid, matches the capsules */
+  --emerald-d: #0c6f36;  /* hover */
+  --forest:    #0c3b29;  /* deep sections / ink-green */
+  --ink:       #16140f;
+  --ink-soft:  #56514a;
+  --line:      #e3ddd0;  /* hairlines on light */
+
+  /* Accents (used sparingly) */
+  --gold:    #e7b73c;
+  --coral:   #e0623a;
+
+  --display: 'Zodiak', Georgia, 'Times New Roman', serif; /* editorial serif — headlines */
+  --sans: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; /* workhorse — body/UI */
+  --serif: var(--sans);
+  --mono: ui-monospace, 'SF Mono', Menlo, monospace; /* claims & dosages */
+
+  --r-lg: 26px;
+  --r-md: 16px;
+  --r-sm: 10px;
+  --shadow: 0 22px 60px -32px rgba(12,40,25,.45);
+  --shadow-sm: 0 8px 24px -16px rgba(12,40,25,.4);
+  --wrap: min(1240px, 92vw);
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body{
+  margin:0; font-family:var(--sans); color:var(--ink); background:var(--paper);
+  font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+img{ display:block; max-width:100%; }
+
+.display{ font-family:var(--display); font-weight:700; line-height:1.04; letter-spacing:-.01em; margin:0; text-wrap:balance; }
+/* never let a long word (e.g. "Microencapsulated") overflow its container */
+h1, h2, h3, .display{ overflow-wrap:break-word; }
+.wrap{ width:var(--wrap); margin-inline:auto; }
+.section{ padding: clamp(64px,9vw,128px) 0; }
+.eyebrow{ font-weight:600; font-size:.74rem; letter-spacing:.16em; text-transform:uppercase; color:var(--emerald); }
+.lead{ font-size:clamp(1.05rem,1.7vw,1.3rem); color:var(--ink-soft); line-height:1.55; }
+
+/* Buttons — clean, confident */
+.btn{
+  display:inline-flex; align-items:center; gap:.5em; font-family:var(--sans); font-weight:600; font-size:1rem;
+  padding:.95em 1.7em; border-radius:999px; border:none; cursor:pointer; text-decoration:none;
+  background:var(--emerald); color:#fff; transition:transform .15s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow:0 10px 26px -12px rgba(16,150,72,.7);
+}
+.btn:hover{ background:var(--emerald-d); transform:translateY(-2px); box-shadow:0 16px 32px -12px rgba(16,150,72,.7); }
+.btn:active{ transform:translateY(0); }
+.btn--ink{ background:var(--ink); box-shadow:0 10px 26px -14px rgba(0,0,0,.6); }
+.btn--ink:hover{ background:#000; }
+.btn--ghost{ background:transparent; color:var(--ink); border:1.5px solid var(--line); box-shadow:none; }
+.btn--ghost:hover{ background:var(--white); border-color:var(--ink); }
+.btn--lg{ padding:1.1em 2.1em; font-size:1.05rem; }
+.tlink{ font-weight:600; color:var(--ink); text-decoration:none; border-bottom:2px solid var(--emerald); padding-bottom:2px; cursor:pointer; }
+.tlink:hover{ color:var(--emerald); }
+
+/* Pills / tags */
+.tag{ display:inline-flex; align-items:center; gap:7px; background:var(--white); border:1px solid var(--line); border-radius:999px; padding:.5em 1em; font-size:.82rem; font-weight:600; }
+.tag .dot{ width:8px; height:8px; border-radius:50%; background:var(--emerald); }
+
+.reveal{ opacity:0; transform:translateY(20px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.in{ opacity:1; transform:none; }
+@media(prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; } }

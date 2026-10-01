@@ -1,0 +1,140 @@
+/* ============================================================
+   Third Biome — redesign extras
+   Content-rich sections layered on the handoff design system:
+   about bullets, postbiotic analogy + comparison, GTB technology,
+   ingredients, journey, stories, FAQ grid, club stewardship.
+   ============================================================ */
+
+/* italic emphasis used in the richer headings */
+.emi { color: var(--emerald); font-style: italic; }
+
+/* verified claims, stats & dosages in the mono/accent face — visually
+   separates "this is a fact" from editorial voice (brand guideline) */
+.emetric .n, .sci-fact b, .ingcard__dose, .stat b, .evi__code {
+  font-family: var(--mono);
+  letter-spacing: -.02em;
+}
+
+/* homepage hero keeps the previous punchy display sans (client preference);
+   the rest of the site uses the editorial serif */
+.hero h1 { font-family: 'Clash Display', var(--sans); font-weight: 600; letter-spacing: -.015em; line-height: .98; }
+
+/* signature motifs — specimen dot (bullet/separator) + hand-drawn underline */
+.spec-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--gold); vertical-align:middle; }
+.uline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M3 8 Q 30 2 60 7 T 117 6' stroke='%23109648' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-size: 100% .42em;
+  padding-bottom: .1em;
+}
+
+/* forest content band */
+.band { background: var(--forest); color: #eaf3ec; border-radius: var(--r-lg); padding: clamp(30px,5vw,64px); position: relative; overflow: hidden; }
+.band--center { text-align: center; }
+.band .eyebrow, .band .kicker { color: var(--gold); }
+.band h2 { font-family: var(--display); font-weight: 600; font-size: clamp(2rem,4.4vw,3.4rem); line-height: 1.04; letter-spacing: -.015em; margin: .4rem 0 0; color: #fff; }
+.band h2 .emi { color: #7fd6a0; }
+@media(max-width:600px){ .band { padding: 26px 22px; } .band h2 { font-size: 1.7rem; } }
+.band > .wrap > p, .band__lead { color: #bcd4c4; margin: 16px 0 0; max-width: 60ch; }
+.band--center .band__lead { margin-inline: auto; }
+
+/* about — 2-col check bullets */
+.checks2 { list-style: none; padding: 0; margin: clamp(24px,3vw,36px) 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+@media (max-width: 680px) { .checks2 { grid-template-columns: 1fr; } }
+.checks2 li { display: flex; gap: 12px; align-items: flex-start; font-weight: 500; }
+.checks2 svg { color: var(--emerald); flex: none; margin-top: 3px; }
+
+/* postbiotics analogy — seeds / fertilizer / harvest */
+.analogy { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: clamp(30px,4vw,48px); }
+@media (max-width: 820px) { .analogy { grid-template-columns: 1fr; } }
+.acard { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 30px; }
+.acard__dot { width: 54px; height: 54px; border-radius: 50%; background: var(--mist); margin-bottom: 20px; }
+.acard:nth-child(2) .acard__dot { background: #dceede; }
+.acard__tier { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--ink-soft); }
+.acard h3 { font-family: var(--display); font-weight: 600; font-size: 1.5rem; margin: 6px 0 0; }
+.acard p { margin: 12px 0 0; color: var(--ink-soft); font-size: .92rem; }
+.acard--dark { background: var(--forest); border-color: var(--forest); color: #eaf3ec; }
+.acard--dark .acard__dot { background: #7fd6a0; }
+.acard--dark .acard__tier { color: #9fc0ad; }
+.acard--dark h3 { color: #fff; }
+.acard--dark p { color: #bcd4c4; }
+.acard__badge { display: inline-block; margin-top: 16px; background: rgba(255,255,255,.12); color: #fff; font-size: .62rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .45em .8em; border-radius: 999px; }
+
+/* comparison table (4-col) */
+.cmpwrap { border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--white); margin-top: clamp(28px,4vw,44px); }
+.cmp-title { padding: 18px 22px; font-weight: 600; border-bottom: 1px solid var(--line); }
+.cmp-scroll { overflow-x: auto; }
+.cmp { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.cmp th, .cmp td { text-align: left; padding: 14px 18px; vertical-align: top; border-top: 1px solid var(--line); }
+.cmp thead th { font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; border-top: none; background: var(--paper); }
+.cmp tbody th { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.cmp td { color: var(--ink-soft); }
+.cmp .post { background: #f1faf4; color: var(--ink); }
+.cmp thead .post { color: var(--emerald); background: #eaf6ee; }
+@media (max-width: 760px) {
+  .cmpwrap { border: none; border-radius: 0; background: transparent; overflow: visible; }
+  .cmp-title { padding: 0 0 6px; border-bottom: none; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
+  .cmp-scroll { overflow: visible; }
+  .cmp { display: block; }
+  .cmp thead { display: none; }
+  .cmp tbody { display: block; }
+  .cmp tr { display: block; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--white); padding-bottom: 6px; margin-top: 12px; overflow: hidden; }
+  .cmp tbody th { display: block; border-top: none; padding: 12px 16px 8px; font-size: 1rem; white-space: normal; }
+  .cmp td { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start; border-top: 1px solid var(--line); padding: 9px 16px; font-size: .87rem; }
+  .cmp td::before { font-size: .6rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; padding-top: 2px; }
+  .cmp td:nth-of-type(1)::before { content: "Probiotics"; color: var(--coral); }
+  .cmp td:nth-of-type(2)::before { content: "Prebiotics"; color: var(--ink-soft); }
+  .cmp td:nth-of-type(3)::before { content: "Postbiotics"; color: var(--emerald); }
+  .cmp .post { background: #f1faf4; }
+}
+
+/* GTB technology — numbered cards inside the forest band */
+.techgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: clamp(26px,3vw,38px); }
+@media (max-width: 820px) { .techgrid { grid-template-columns: 1fr; } }
+.techcard { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.16); border-radius: var(--r-md); padding: 24px; }
+.techcard .num { width: 30px; height: 30px; border-radius: 50%; background: rgba(127,214,160,.18); color: #7fd6a0; display: grid; place-items: center; font-family: var(--display); font-weight: 600; font-size: .9rem; }
+.techcard .step { font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: #7fd6a0; margin: 14px 0 0; }
+.techcard h4 { margin: 6px 0 0; font-size: 1.1rem; color: #fff; }
+.techcard p { margin: 10px 0 0; font-size: .86rem; color: #bcd4c4; }
+
+/* ingredients */
+.inggrid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: clamp(30px,4vw,48px); }
+@media (max-width: 680px) { .inggrid { grid-template-columns: 1fr; } }
+.ingcard { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 26px; }
+.ingcard__top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ingcard__name { font-family: var(--display); font-weight: 600; font-size: 1.3rem; }
+.ingcard__dose { font-weight: 700; color: var(--emerald); font-size: .92rem; white-space: nowrap; }
+.ingcard__type { font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--ink-soft); margin-top: 4px; }
+.ingcard ul { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; }
+.ingcard li { display: flex; gap: 10px; align-items: flex-start; font-size: .9rem; }
+.ingcard li svg { color: var(--emerald); flex: none; margin-top: 3px; }
+
+/* doctor / biome stories */
+.stories { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: clamp(30px,4vw,48px); }
+@media (max-width: 760px) { .stories { grid-template-columns: 1fr; } }
+.story { border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--white); }
+.story__media { position: relative; aspect-ratio: 16/10; background: linear-gradient(150deg,var(--forest),#0a2e20); display: grid; place-items: center; }
+.story__play { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--emerald); display: grid; place-items: center; }
+.story__body { padding: 18px; }
+.story__name { font-weight: 700; }
+.story__role { font-size: .82rem; color: var(--ink-soft); margin-top: 3px; }
+
+/* FAQ — 2-col accordion */
+.faq2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(28px,4vw,56px); margin-top: clamp(28px,4vw,44px); align-items: start; }
+@media (max-width: 760px) { .faq2 { grid-template-columns: 1fr; } }
+.faq2 .acc { margin-top: 0; }
+
+/* club — 30-day stewardship */
+.steward { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px,5vw,60px); align-items: center; }
+@media (max-width: 860px) { .steward { grid-template-columns: 1fr; } }
+.stats { display: flex; gap: 30px; flex-wrap: wrap; margin: 26px 0; }
+.stat b { display: block; font-family: var(--display); font-weight: 600; font-size: 2rem; line-height: 1; color: var(--emerald); }
+.stat span { display: block; font-size: .82rem; color: var(--ink-soft); margin-top: 6px; }
+.arc { background: var(--forest); color: #eaf3ec; border-radius: var(--r-lg); padding: clamp(26px,3vw,38px); }
+.arc__lbl { font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: #9fc0ad; margin-bottom: 8px; }
+.arc__row { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(255,255,255,.12); }
+.arc__row:first-of-type { border-top: none; }
+.arc__n { width: 30px; height: 30px; border-radius: 50%; background: rgba(127,214,160,.18); color: #7fd6a0; display: grid; place-items: center; font-family: var(--display); font-weight: 600; font-size: .85rem; }
+.arc__row h4 { margin: 0; font-size: 1rem; color: #fff; }
+.arc__row p { margin: 5px 0 0; font-size: .84rem; color: #bcd4c4; }
