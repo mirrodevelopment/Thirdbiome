@@ -113,8 +113,8 @@ export const PDP_WELCOME_OFFER_CONFIG = {
   // When this deadline date passes, the popup and active countdown automatically cease.
   deadline: "2026-10-31T23:59:59+05:30",
 
-  // Auto-trigger delay in milliseconds (e.g. 6000ms = 6 seconds)
-  autoTriggerDelayMs: 6000,
+  // Auto-trigger delay in milliseconds (e.g. 800ms for immediate prompt entrance)
+  autoTriggerDelayMs: 800,
 
   // Sticky Bottom-Left Teaser Pill (shown in bottom-left corner)
   stickyPillText: "Get ₹200 off",

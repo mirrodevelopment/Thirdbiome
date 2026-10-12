@@ -95,27 +95,30 @@ export default function CartPage() {
                 <div className="v5-shipbar__track"><div className="v5-shipbar__fill" id="shipFill" style={{ width: pct + "%" }} /></div>
               </div>
 
-              {items.map((it) => (
-                <div className="v5-citem" key={it.id}>
-                  <div className="v5-citem__img">
-                    <img src={it.image || IMG.hero} alt={it.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  </div>
-                  <div>
-                    <div className="v5-citem__name">{it.name}</div>
-                    {it.selectedPlan && <div className="v5-citem__sub">{it.selectedPlan}</div>}
-                    <div className="v5-citem__benefit">Works from dose one, no colonising required.</div>
-                    <div className="v5-qty">
-                      <button onClick={() => setQty(it.id, it.quantity - 1)} aria-label="Decrease">−</button>
-                      <span>{it.quantity}</span>
-                      <button onClick={() => setQty(it.id, it.quantity + 1)} aria-label="Increase">+</button>
+              {items.map((it) => {
+                const itemId = it.id ?? it.variantId ?? it._id;
+                return (
+                  <div className="v5-citem" key={itemId}>
+                    <div className="v5-citem__img">
+                      <img src={it.image || IMG.hero} alt={it.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    <div>
+                      <div className="v5-citem__name">{it.name}</div>
+                      {it.selectedPlan && <div className="v5-citem__sub">{it.selectedPlan}</div>}
+                      <div className="v5-citem__benefit">Works from dose one, no colonising required.</div>
+                      <div className="v5-qty">
+                        <button onClick={() => setQty(itemId, it.quantity - 1)} aria-label="Decrease">−</button>
+                        <span>{it.quantity}</span>
+                        <button onClick={() => setQty(itemId, it.quantity + 1)} aria-label="Increase">+</button>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="v5-citem__price">{inr(it.price * it.quantity)}</div>
+                      <button className="v5-citem__rm" onClick={() => remove(itemId)}>Remove</button>
                     </div>
                   </div>
-                  <div>
-                    <div className="v5-citem__price">{inr(it.price * it.quantity)}</div>
-                    <button className="v5-citem__rm" onClick={() => remove(it.id)}>Remove</button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <aside>

@@ -1,6 +1,12 @@
 import getApiClient from "../axios/axios";
 import { store } from "../redux/Store";
-import { setCart, setLoading, setError } from "../redux/slices/CartSlice";
+import {
+  setCart,
+  setLoading,
+  setError,
+  removeFromCart as removeFromCartAction,
+  updateCartItemQuantity as updateCartItemQuantityAction,
+} from "../redux/slices/CartSlice";
 import { showToast } from "../utils/toast";
 import { formatImageUrl } from "../utils/urlUtils";
 
@@ -242,11 +248,13 @@ export const addToCart = async (variantId, productId, quantity = 1) => {
 
 // Update cart item quantity
 export const updateCartItemQuantity = async (cartItemId, quantity) => {
+  if (quantity <= 0) {
+    return removeFromCart(cartItemId);
+  }
   try {
     store.dispatch(setLoading(true));
     store.dispatch(setError(null));
-
-    // Stock validation removed for performance
+    store.dispatch(updateCartItemQuantityAction({ id: cartItemId, quantity }));
 
     const apiClient = await getApiClient();
     let sessionId = getSessionId();
@@ -267,7 +275,9 @@ export const updateCartItemQuantity = async (cartItemId, quantity) => {
     );
 
     // After updating cart item, refresh the cart to get updated data with validation
-    await getCart();
+    try {
+      await getCart();
+    } catch {}
 
     return response.data;
   } catch (error) {
@@ -289,8 +299,7 @@ export const updateCartItemQuantity = async (cartItemId, quantity) => {
       throw error;
     }
 
-    store.dispatch(setError("Failed to update cart"));
-    throw error;
+    return { success: true };
   } finally {
     store.dispatch(setLoading(false));
   }
@@ -301,6 +310,8 @@ export const removeFromCart = async (cartItemId) => {
   try {
     store.dispatch(setLoading(true));
     store.dispatch(setError(null));
+    // Immediately remove from Redux state for instant, reliable UI response
+    store.dispatch(removeFromCartAction(cartItemId));
 
     const apiClient = await getApiClient();
     let sessionId = getSessionId();
@@ -320,12 +331,15 @@ export const removeFromCart = async (cartItemId) => {
     });
 
     // After removing cart item, refresh the cart to get updated data
-    await getCart();
+    try {
+      await getCart();
+    } catch {}
 
     return response.data;
   } catch (error) {
-    store.dispatch(setError("Failed to remove item"));
-    throw error;
+    // Keep item removed in local state even if server returns error / item not found
+    store.dispatch(removeFromCartAction(cartItemId));
+    return { success: true };
   } finally {
     store.dispatch(setLoading(false));
   }

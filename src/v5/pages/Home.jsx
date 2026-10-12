@@ -9,6 +9,9 @@ import Seo from "../components/Seo";
 import contactService from "../../services/contactService";
 import { getBlogs } from "../../services/blogService";
 import gutMotion from "../assets/gut-motion.mp4";
+import ConversationalFaq from "../components/ConversationalFaq";
+import StoriesSection from "../components/StoriesSection";
+import mascotImg from "../../assets/mascot.png";
 
 const SYMPTOM_CHIPS = [
   { label: "Bloating after a light meal", reply: "The food baby, minus the food. Classic." },
@@ -422,6 +425,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* GUT SCORE INTRO (BEFORE YOU BUY ANYTHING) */}
+      <section className="gut-intro-section" data-screen-label="Gut Score Intro">
+        <div className="gut-intro-wrap" data-reveal="">
+          <div className="gut-intro-box">
+            <span className="gut-intro-eyebrow">GUT SCORE · 2 MINUTES</span>
+            <h2 className="gut-intro-title">
+              Before you buy anything, understand your starting point.
+            </h2>
+            <p className="gut-intro-desc">
+              Six quick questions. A score out of 100, the patterns we spot, and simple things to try first. Not a diagnosis.
+            </p>
+            <Link to="/quiz" className="gut-intro-btn">
+              Take the Gut Score
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* FINDER */}
       <section data-screen-label="Finder">
         <div className="finder" data-reveal="">
@@ -476,6 +497,50 @@ export default function Home() {
                 <div className="ccard__body"><h3>{c.h}</h3><p>{c.p}</p></div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS / THREE STOPS ROAD TRIP */}
+      <section className="sheet sheet--pad roadtrip-section" id="how-it-works" data-screen-label="How it works">
+        <div className="wrap" data-reveal="">
+          <div className="roadtrip-container">
+            <div className="roadtrip-header">
+              <span className="roadtrip-eyebrow">How it works</span>
+              <h2>One capsule. Three stops. A very short road trip.</h2>
+            </div>
+
+            <div className="roadtrip-grid">
+              <article className="roadtrip-card">
+                <span className="roadtrip-step">Stop 1</span>
+                <h3>Survives the stomach</h3>
+                <p>
+                  Stomach acid is tough. Our capsule is tougher. A protective coat gets Third Biome GTB™ through in one piece.
+                </p>
+              </article>
+
+              <article className="roadtrip-card">
+                <span className="roadtrip-step">Stop 2</span>
+                <h3>Opens where it counts</h3>
+                <p>
+                  It opens in your lower gut, the part doing the heavy lifting of digestion. No detours, no stops for chai.
+                </p>
+              </article>
+
+              <article className="roadtrip-card">
+                <span className="roadtrip-step">Stop 3</span>
+                <h3>Refuels your gut</h3>
+                <p>
+                  It hands your gut the fuel it's been running low on. A well-fuelled gut supports calmer, more regular days.
+                </p>
+              </article>
+            </div>
+
+            <div className="roadtrip-footer">
+              <Link to="/evidence" className="roadtrip-link">
+                The full science, with sources →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -652,50 +717,156 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PROBIOTIC QUESTIONS */}
-      <section className="sheet sheet--pad" data-screen-label="Common probiotic questions">
-        <div className="wrap">
-          <div className="shead">
-            <div>
-              <span className="eyebrow">In their own words</span>
-              <h2 style={{ marginTop: 14 }}>Common Questions About Probiotics and Postbiotics.</h2>
+      {/* GUT AS A GARDEN (PRE / PRO / POSTBIOTICS) */}
+      <section className="sheet sheet--pad garden-section" data-screen-label="Gut as a Garden">
+        <div className="wrap" data-reveal="">
+          <div className="garden-container">
+            <div className="garden-header">
+              <span className="garden-eyebrow">First came probiotics. Then prebiotics. Now meet postbiotics.</span>
+              <h2>Think of your gut as a garden.</h2>
             </div>
-            <p>Compare how probiotics and postbiotics differ across commonly asked questions about digestive health, microbiome support and delivery mechanisms.</p>
-          </div>
-          <div className="qa">
-            {PROBIOTIC_QUESTIONS.map((item) => (
-              <QARow key={item.q} q={item.q} pro={<p>{item.pro}</p>} post={<p>{item.post}</p>} />
-            ))}
+
+            <div className="garden-grid">
+              {/* Card 1: Prebiotics */}
+              <article className="garden-card">
+                <span className="garden-card__step">1 · FEED</span>
+                <h3 className="garden-card__title">Prebiotics</h3>
+                <p className="garden-card__desc">
+                  Food for the good bacteria in your gut, like fertiliser for a garden. Found in fibre: dal, oats, bananas, onions.
+                </p>
+              </article>
+
+              {/* Card 2: Probiotics */}
+              <article className="garden-card">
+                <span className="garden-card__step">2 · INTRODUCE</span>
+                <h3 className="garden-card__title">Probiotics</h3>
+                <p className="garden-card__desc">
+                  Live good bacteria you swallow, like planting new seedlings and hoping they settle in.
+                </p>
+              </article>
+
+              {/* Card 3: Postbiotics (Highlighted) */}
+              <article className="garden-card garden-card--highlight">
+                <span className="garden-card__step">3 · DELIVER</span>
+                <h3 className="garden-card__title">Postbiotics</h3>
+                <p className="garden-card__desc">
+                  The helpful stuff good bacteria make or leave behind, like the fruit the garden grows. No growing needed.
+                </p>
+              </article>
+            </div>
+
+            {/* Conversation Snippet */}
+            <div className="garden-chat">
+              {/* User Bubble */}
+              <div className="garden-chat__row garden-chat__row--user">
+                <span className="garden-chat__sender">YOU</span>
+                <div className="garden-chat__bubble-wrap">
+                  <div className="garden-chat__bubble garden-chat__bubble--user">
+                    So which one is Biome Balance?
+                  </div>
+                  <div className="garden-chat__avatar-user">You</div>
+                </div>
+              </div>
+
+              {/* Tibbi Bubble */}
+              <div className="garden-chat__row garden-chat__row--tibby">
+                <span className="garden-chat__sender">TIBBI</span>
+                <div className="garden-chat__bubble-wrap">
+                  <div className="garden-chat__avatar-tibby">
+                    <img src={mascotImg} alt="Tibbi" />
+                  </div>
+                  <div className="garden-chat__bubble garden-chat__bubble--tibby">
+                    It's on team "deliver". It carries butyrate, one of the most useful things good bacteria make, straight to where your gut needs it.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="garden-footer">
+              <Link to="/journal" className="garden-guide-link">
+                Pre, pro, postbiotic: the full guide →
+              </Link>
+              <button
+                type="button"
+                className="btn btn--white garden-chat-btn"
+                onClick={() => window.dispatchEvent(new Event("t3b:open-tibby-chat"))}
+              >
+                Ask Tibbi anything
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <section className="sheet sheet--pad" id="reviews" data-screen-label="Reviews">
-        <div className="wrap">
-          <div className="shead">
-            <div>
-              <span className="eyebrow">The T3B experience</span>
-              <h2 style={{ marginTop: 14 }}>Real guts. Real talk.</h2>
+      {/* REAL GUTS, REAL PEOPLE / CHECK-INS */}
+      <section className="sheet sheet--pad checkins-section" id="reviews" data-screen-label="Reviews">
+        <div className="wrap" data-reveal="">
+          <div className="checkins-container">
+            <div className="checkins-header">
+              <span className="checkins-eyebrow">Real guts, real people</span>
+              <h2>Three people. Their check-ins. Zero stock photos.</h2>
             </div>
-            <p>300+ members across 4 T3B Club cohorts, sharing honest results.</p>
-          </div>
-          <div className="revs">
-            {REVIEWS.map((r) => (
-              <article className="rev" data-reveal="" key={r.nm}>
-                <span className="stars" aria-label="5 out of 5 stars">{r.stars}</span>
-                <p>{r.p}</p>
-                <div className="who">
-                  <div className="av" aria-hidden="true">{r.av}</div>
+
+            <div className="checkins-grid">
+              {/* Card 1: Karthikayan */}
+              <article className="checkin-card">
+                <div className="checkin-card__head">
+                  <div className="checkin-avatar">
+                    <img src={IMG.patKarthikayan} alt="Karthikayan" />
+                  </div>
                   <div>
-                    <div className="nm">{r.nm}</div>
-                    <div className="vf">{r.city} · Biome Balance user</div>
+                    <h3 className="checkin-name">Karthikayan, 30</h3>
+                    <div className="checkin-tag">Bloating, Cravings · 30 Days</div>
                   </div>
                 </div>
+                <p className="checkin-quote">
+                  Rated his bloating <strong>10 out of 10</strong> at the start. By day 30, he rated it a <strong>1</strong>.
+                </p>
               </article>
-            ))}
+
+              {/* Card 2: Aravind */}
+              <article className="checkin-card">
+                <div className="checkin-card__head">
+                  <div className="checkin-avatar">
+                    <img src={IMG.patAravind} alt="Aravind" />
+                  </div>
+                  <div>
+                    <h3 className="checkin-name">Aravind, 46</h3>
+                    <div className="checkin-tag">Gas, Bloating · 4 Weeks</div>
+                  </div>
+                </div>
+                <p className="checkin-quote">
+                  Noticed the <strong>gas and bloating ease first</strong>, before anything else changed.
+                </p>
+              </article>
+
+              {/* Card 3: Shweta */}
+              <article className="checkin-card">
+                <div className="checkin-card__head">
+                  <div className="checkin-avatar">
+                    <img src={IMG.patShweta} alt="Shweta" />
+                  </div>
+                  <div>
+                    <h3 className="checkin-name">Shweta, 36</h3>
+                    <div className="checkin-tag">Irregular, Moody · 30 Days</div>
+                  </div>
+                </div>
+                <p className="checkin-quote">
+                  Reported feeling <strong>far less irritable</strong> by the end of the month.
+                </p>
+              </article>
+            </div>
+
+            <div className="checkins-footer">
+              <p className="checkins-disclaimer">
+                Each story is one person, self-reported. Your gut is its own story.
+              </p>
+              <Link className="btn btn--dark checkins-more-btn" to="/case-studies">
+                Read more stories <Arr />
+              </Link>
+            </div>
           </div>
-          <div className="reviews__more"><Link className="btn btn--white" to="/case-studies">Read more stories <Arr /></Link></div>
         </div>
       </section>
 
@@ -740,48 +911,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="sheet sheet--pad" data-screen-label="FAQ">
-        <div className="wrap faq">
-          <div className="shead" style={{ justifyContent: "center", textAlign: "center" }}><div><span className="eyebrow" style={{ justifyContent: "center" }}>Good questions</span><h2 style={{ marginTop: 14 }}>The honest FAQ</h2></div></div>
-          <div className="acc">
-            <AccItem q="Is this a probiotic?" defaultOpen>
-              <p>No. It's a postbiotic, the finished metabolite (butyrate, via Thirdbiome GTB™) your gut would normally make for itself. There are no live cultures to keep alive or hope will colonise.</p>
-            </AccItem>
-            <AccItem q="When will I notice something?">
-              <p>Most people feel gas and bloating ease within the first week or two. Gut-brain and systemic benefits build over the season, think months, not days.</p>
-            </AccItem>
-            <AccItem q="Is the technology proprietary?">
-              <p>Yes. Thirdbiome GTB™ is built on our own proprietary technology. We describe it as proprietary, nothing we can't stand behind.</p>
-            </AccItem>
-            <AccItem q="What exactly was in your trial?">
-              <p>A registered, randomised, double-blinded RCT (CTRI/2025/09/094597) over 45 days. The GTB arm raised stool butyrate by 74%, with symptom scores significantly improving alongside.</p>
-            </AccItem>
-            <AccItem q="Is a postbiotic safe?">
-              <p>We’re confirming the product-specific safety information. Please follow the product label and ask a healthcare professional if you have questions about whether it’s right for you.</p>
-            </AccItem>
-            <AccItem q="When should I take it?">
-              <p>We’re confirming the product-specific dose and timing. Follow the directions on the product label.</p>
-            </AccItem>
-            <AccItem q="Can I take it with my probiotic?">
-              <p>We’re confirming product-specific guidance on taking it alongside a probiotic. If you use other supplements or medicines, ask a healthcare professional.</p>
-            </AccItem>
-            <AccItem q="Is it vegetarian?">
-              <p>We’re confirming the capsule material. Check the product label for the latest ingredient information.</p>
-            </AccItem>
-            <AccItem q="Does it need the fridge?">
-              <p>We’re confirming the product-specific storage guidance. Follow the directions on the product label.</p>
-            </AccItem>
-          </div>
-        </div>
-      </section>
+      {/* MEMBER & SCIENTIST STORIES / VIDEO CAROUSEL */}
+      <StoriesSection />
 
-      {/* BOTTOM CTA */}
-      <section className="sheet sheet--pad" aria-label="Start your gut reset">
-        <div className="wrap" style={{ textAlign: "center" }}>
-          <span className="eyebrow" style={{ justifyContent: "center" }}>A simple daily start</span>
-          <h2 style={{ margin: "14px auto 22px" }}>Ready to give your gut a reset?</h2>
-          <Link className="btn btn--dark" to="/products/biome-balance">Start your gut reset <Arr /></Link>
+      {/* CONVERSATIONAL FAQ (SUNNY & TIBBY) */}
+      <ConversationalFaq />
+
+      {/* GUT SCORE BANNER */}
+      <section className="sheet sheet--pad gut-score-section" data-screen-label="Gut Score">
+        <div className="wrap" data-reveal="">
+          <div className="gut-score-banner">
+            <h2 className="gut-score-banner__title">
+              Your gut doesn't need more noise.<br />
+              It needs a better starting point.
+            </h2>
+            <div className="gut-score-banner__actions">
+              <Link to="/quiz" className="gut-score-banner__btn gut-score-banner__btn--score">
+                Take the Gut Score
+              </Link>
+              <Link to="/products/biome-balance" className="gut-score-banner__btn gut-score-banner__btn--shop">
+                Start feeling lighter · Shop now
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

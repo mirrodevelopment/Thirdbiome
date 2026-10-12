@@ -16,25 +16,26 @@ export default function Popup() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
 
-  // Show immediately on 1st entrance to the website
+// Show on 1st entrance to the website
   useEffect(() => {
-    const alreadyHandled = () =>
-      localStorage.getItem(OFFER_SEEN_KEY) ||
-      localStorage.getItem(OFFER_DISMISSED_KEY) ||
-      localStorage.getItem(OFFER_SUBMITTED_KEY);
+    // If the user has already submitted the welcome offer, don't show it again
+    if (localStorage.getItem(OFFER_SUBMITTED_KEY)) return undefined;
 
-    if (alreadyHandled()) return undefined;
+    // If dismissed in this session, don't auto-popup again in the same session
+    if (sessionStorage.getItem(OFFER_DISMISSED_KEY)) return undefined;
 
-    // Trigger popup on first visit after 1 second delay
+    // Trigger popup on first visit after 800ms
     const entranceTimer = window.setTimeout(() => {
-      if (alreadyHandled()) return;
-      localStorage.setItem(OFFER_SEEN_KEY, "1");
       setShow(true);
-    }, 1000);
+      sessionStorage.setItem(OFFER_SEEN_KEY, "1");
+    }, 800);
 
     const onExitIntent = (event) => {
-      if (event.clientY <= 0 && !alreadyHandled()) {
-        localStorage.setItem(OFFER_SEEN_KEY, "1");
+      if (
+        event.clientY <= 0 &&
+        !localStorage.getItem(OFFER_SUBMITTED_KEY) &&
+        !sessionStorage.getItem(OFFER_DISMISSED_KEY)
+      ) {
         setShow(true);
       }
     };
@@ -46,7 +47,7 @@ export default function Popup() {
     };
   }, []);
 
-  // Listen for manual trigger events (e.g. from buttons or links)
+  // Listen for manual trigger events (e.g. from hero welcome offer pills)
   useEffect(() => {
     const openWelcomeOffer = () => {
       setShow(true);
@@ -67,7 +68,7 @@ export default function Popup() {
 
   const dismiss = () => {
     setShow(false);
-    localStorage.setItem(OFFER_DISMISSED_KEY, "1");
+    sessionStorage.setItem(OFFER_DISMISSED_KEY, "1");
   };
 
   const submit = async (event) => {

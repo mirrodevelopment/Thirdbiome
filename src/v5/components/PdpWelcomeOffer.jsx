@@ -37,22 +37,23 @@ export default function PdpWelcomeOffer() {
     return () => clearInterval(interval);
   }, [config.deadline, timeLeft.expired]);
 
-  // Trigger once per visitor on delay or exit intent
+  // Trigger on 1st entrance to the shop page
   useEffect(() => {
     if (timeLeft.expired) return undefined;
-    const hasSeen = localStorage.getItem(PDP_OFFER_SEEN_KEY) || localStorage.getItem(PDP_OFFER_DISMISSED_KEY);
-    if (hasSeen) return undefined;
+    if (localStorage.getItem("t3b_pdp_welcome_offer_applied")) return undefined;
+    if (sessionStorage.getItem(PDP_OFFER_DISMISSED_KEY)) return undefined;
 
     const autoOpenTimer = setTimeout(() => {
-      if (!localStorage.getItem(PDP_OFFER_SEEN_KEY)) {
-        localStorage.setItem(PDP_OFFER_SEEN_KEY, "1");
-        setIsOpen(true);
-      }
-    }, config.autoTriggerDelayMs || 6000);
+      sessionStorage.setItem(PDP_OFFER_SEEN_KEY, "1");
+      setIsOpen(true);
+    }, config.autoTriggerDelayMs || 800);
 
     const onExitIntent = (e) => {
-      if (e.clientY <= 0 && !localStorage.getItem(PDP_OFFER_SEEN_KEY)) {
-        localStorage.setItem(PDP_OFFER_SEEN_KEY, "1");
+      if (
+        e.clientY <= 0 &&
+        !localStorage.getItem("t3b_pdp_welcome_offer_applied") &&
+        !sessionStorage.getItem(PDP_OFFER_DISMISSED_KEY)
+      ) {
         setIsOpen(true);
       }
     };
@@ -76,13 +77,14 @@ export default function PdpWelcomeOffer() {
 
   const dismiss = () => {
     setIsOpen(false);
-    localStorage.setItem(PDP_OFFER_DISMISSED_KEY, "1");
+    sessionStorage.setItem(PDP_OFFER_DISMISSED_KEY, "1");
   };
 
   const handleApplyOffer = () => {
     sessionStorage.setItem("t3b_pending_coupon", config.couponCode);
     setIsApplied(true);
-    localStorage.setItem(PDP_OFFER_DISMISSED_KEY, "1");
+    localStorage.setItem("t3b_pdp_welcome_offer_applied", "1");
+    sessionStorage.setItem(PDP_OFFER_DISMISSED_KEY, "1");
     setTimeout(() => {
       setIsOpen(false);
       const buySection = document.getElementById("subs") || document.getElementById("addBag");

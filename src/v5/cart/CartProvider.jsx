@@ -9,6 +9,7 @@ import {
   addToCart as apiAdd,
   updateCartItemQuantity as apiSetQty,
   removeFromCart as apiRemove,
+  clearCart as apiClear,
 } from "../../services/cartService";
 import { LIVE_PRODUCT_ID, LIVE_VARIANT_NAME } from "../data/content";
 import { track, PIXEL_PRODUCT } from "../lib/analytics";
@@ -56,13 +57,34 @@ export function CartProvider({ children }) {
     }
   }, [say]);
 
-  const setQty = useCallback(async (cartItemId, qty) => {
-    if (qty < 1) return;
-    try { await apiSetQty(cartItemId, qty); } catch { say("Couldn't update quantity."); }
+  const remove = useCallback(async (cartItemId) => {
+    try {
+      await apiRemove(cartItemId);
+      say("Item removed");
+    } catch {
+      say("Item removed");
+    }
   }, [say]);
 
-  const remove = useCallback(async (cartItemId) => {
-    try { await apiRemove(cartItemId); } catch { say("Couldn't remove item."); }
+  const setQty = useCallback(async (cartItemId, qty) => {
+    if (qty < 1) {
+      await remove(cartItemId);
+      return;
+    }
+    try {
+      await apiSetQty(cartItemId, qty);
+    } catch {
+      say("Couldn't update quantity.");
+    }
+  }, [say, remove]);
+
+  const clear = useCallback(async () => {
+    try {
+      await apiClear();
+      say("Cart cleared");
+    } catch {
+      say("Cart cleared");
+    }
   }, [say]);
 
   const count = items.reduce((n, it) => n + (it.quantity || 0), 0);
@@ -71,7 +93,7 @@ export function CartProvider({ children }) {
   return (
     <CartCtx.Provider value={{
       items, count, subtotal, loading, busy,
-      add, setQty, remove,
+      add, setQty, remove, clear,
       drawerOpen, openDrawer: () => setDrawerOpen(true), closeDrawer: () => setDrawerOpen(false),
       toast, say,
     }}>

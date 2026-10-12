@@ -6,6 +6,7 @@ import Nav from "./Nav";
 import Footer from "./Footer";
 import CartDrawer from "./CartDrawer";
 import Popup from "./Popup";
+import TibbyFloatingBot from "./TibbyFloatingBot";
 import { useCart } from "../cart/CartProvider";
 import { useReveal } from "./ui";
 
@@ -34,6 +35,7 @@ export default function Layout() {
         </div>
         <CartDrawer />
         <Popup />
+        <TibbyFloatingBot />
         <div className={`toast${toast ? " on" : ""}`}>{toast || "Added to cart ✓"}</div>
         {/* production services report errors via react-toastify (v11 injects its own styles) */}
         <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar theme="colored" />
