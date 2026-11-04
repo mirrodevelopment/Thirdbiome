@@ -40,7 +40,7 @@ jobs:
 
       - name: Ensure custom domain CNAME
         run: |
-          echo "plus33.co" > dist/CNAME
+          echo "www.plus33.co" > dist/CNAME
           echo "Checking CNAME:"
           cat dist/CNAME
 
