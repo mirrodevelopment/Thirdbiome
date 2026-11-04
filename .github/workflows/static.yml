@@ -38,6 +38,12 @@ jobs:
       - name: Build website
         run: npm run build
 
+      - name: Ensure custom domain CNAME
+        run: |
+          echo "plus33.co" > dist/CNAME
+          echo "Checking CNAME:"
+          cat dist/CNAME
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
