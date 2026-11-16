@@ -9,6 +9,12 @@ const FAQ_CONVERSATIONS = [
     sunny: "Skipping straight to the good part. Respect."
   },
   {
+    id: "clinical",
+    q: "Is Biome Balance clinically proven?",
+    tibby: "Yes! Backed by a CTRI-registered double-blind RCT showing a +74% increase in fecal butyrate levels, restored gut tight junctions, and rapid bloating relief within 14 days. Plus 3 peer-reviewed scientific papers.",
+    sunny: "Real registered trials and published papers. That's the confidence I need."
+  },
+  {
     id: "timing",
     q: "When will I notice something?",
     tibby: "Most people feel gas and bloating ease within the first 7 to 14 days. Deeper gut barrier repair, regular motility, and sustained energy compound over 4 to 8 weeks.",

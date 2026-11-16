@@ -38,10 +38,40 @@ const INITIAL_MESSAGES = [
 
 const PRESET_TOPICS = [
   {
+    id: "q_clinical",
+    label: "Is it clinically proven?",
+    question: "Is Biome Balance clinically proven by real human trials?",
+    answer: "Yes, 100%! Third Biome is backed by a CTRI-registered, double-blinded Randomized Controlled Trial (RCT) demonstrating a +74% increase in fecal butyrate levels, with significant reduction in gas and bloating within 14 days.\n\nYou can inspect our full trial data in our [Evidence & Clinical Trials](/evidence) dossier and [Scientific Publications](/scientific-publications) library!"
+  },
+  {
     id: "q_secret",
     label: "What is a postbiotic?",
     question: "What is a postbiotic, and why don't most people know about it?",
     answer: "Here’s something most people don’t know: Probiotics (bacteria) must eat prebiotic fiber to create POSTBIOTICS (butyrate). Butyrate is the real compound that seals your gut lining, calms bloating, and fuels gut cells. We give you the pure postbiotic directly—no guessing."
+  },
+  {
+    id: "q_papers",
+    label: "Our Scientific Papers",
+    question: "Where can I read Third Biome's published research papers?",
+    answer: "You can explore our full peer-reviewed papers in our [Scientific Publications](/scientific-publications) repository:\n• Paper 01: Postbiotic Strategies after Antibiotic Exposure\n• Paper 02: Postbiotic Strategies in PCOS & Metabolic Health\n• Paper 03: Targeted Butyrate Supplementation in the Indian Gut Phenotype\n\nEach dossier includes full abstracts, DOIs, and clinical implications."
+  },
+  {
+    id: "q_antibiotics",
+    label: "Antibiotic recovery?",
+    question: "Can I take Biome Balance if I'm taking antibiotics or recovering from an infection?",
+    answer: "Yes, absolutely! While antibiotics kill live probiotics, postbiotics are non-living bioactive metabolites. They survive antibiotic courses completely unharmed, actively shielding your gut lining against secondary dysbiosis and opportunistic infections. Read our published research in [Paper 01 on Antibiotic Recovery](/scientific-publications/postbiotic-strategies-antibiotic-exposure)."
+  },
+  {
+    id: "q_pcos",
+    label: "PCOS & metabolic health?",
+    question: "How do postbiotics help with PCOS, insulin resistance, or hormonal balance?",
+    answer: "In PCOS, 'leaky gut' allows bacterial endotoxins (LPS) into systemic circulation, triggering chronic low-grade inflammation that aggravates insulin resistance and increases ovarian androgens. By sealing mucosal tight junctions and restoring SCFAs, Biome Balance supports metabolic signaling. Read our research in [Paper 02 on PCOS](/scientific-publications/postbiotic-strategies-pcos-adolescence)."
+  },
+  {
+    id: "q_indian",
+    label: "Why for the Indian gut?",
+    question: "Why was Biome Balance formulated specifically for Indian dietary habits?",
+    answer: "Modern Indian diets are high in carbohydrates and often deficient in diverse fermentable fiber, leaving the microbiome chronically starved of butyrate. Live probiotics struggle to colonize, whereas Biome Balance delivers targeted GTB™ butyrate straight to the colon. Read our double-blind trial in [Paper 03 on the Indian Phenotype](/scientific-publications/butyrate-pcos-indian-phenotype)."
   },
   {
     id: "q_fridge",
@@ -53,7 +83,7 @@ const PRESET_TOPICS = [
     id: "q_timing",
     label: "When is the best time to take it?",
     question: "When should I take my daily dose?",
-    answer: "Take 2 capsules once a day, preferably with a morning meal or water. Consistency beats perfection—just take it around the same time daily."
+    answer: "Take 2 capsules once a day, preferably in the morning with breakfast or water. Consistency beats perfection—just take it around the same time daily."
   },
   {
     id: "q_results",
@@ -65,13 +95,7 @@ const PRESET_TOPICS = [
     id: "q_acid",
     label: "Does stomach acid destroy it?",
     question: "Can stomach acid kill butyrate?",
-    answer: "Stomach acid wipes out over 90% of fragile probiotics. But Biome Balance delivers targeted, enteric-protected butyrate straight to the colon where your cells absorb it instantly."
-  },
-  {
-    id: "q_antibiotics",
-    label: "Can I take it with antibiotics?",
-    question: "Can I take Biome Balance if I'm taking antibiotics or other medications?",
-    answer: "Yes, absolutely! Unlike live probiotics that are wiped out by antibiotics, postbiotics are non-living bioactive metabolites. They safely protect your gut lining during and after antibiotic courses."
+    answer: "Stomach acid wipes out over 90% of fragile probiotics. But Biome Balance delivers targeted, 99.4% enteric-protected butyrate straight to the colon where your cells absorb it instantly."
   },
   {
     id: "q_daily",
@@ -95,9 +119,63 @@ const PRESET_TOPICS = [
     id: "q_dietary",
     label: "Is it vegan & gluten-free?",
     question: "What dietary standards does Biome Balance follow?",
-    answer: "100% vegan, gluten-free, dairy-free, allergen-free, and non-GMO. Formulated in plant-based delayed-release capsules at a US FDA-registered, WHO-GMP certified facility."
+    answer: "100% vegan, gluten-free, dairy-free, allergen-free, and non-GMO. Formulated in plant-based delayed-release capsules at a US FDA-registered, WHO-GMP certified facility and approved by FSSAI."
   }
 ];
+
+// Helper to render markdown links & formatting inside chat bubbles
+function formatTibbyMessage(text) {
+  if (!text) return null;
+  const lines = text.split("\n");
+
+  return lines.map((line, lineIdx) => {
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(line.substring(lastIndex, match.index));
+      }
+      const label = match[1];
+      const url = match[2];
+      const isInternal = url.startsWith("/");
+
+      if (isInternal) {
+        parts.push(
+          <Link key={`link-${lineIdx}-${match.index}`} to={url} className="tibby-chat-link">
+            {label} →
+          </Link>
+        );
+      } else {
+        parts.push(
+          <a
+            key={`link-${lineIdx}-${match.index}`}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tibby-chat-link"
+          >
+            {label} ↗
+          </a>
+        );
+      }
+      lastIndex = linkRegex.lastIndex;
+    }
+
+    if (lastIndex < line.length) {
+      parts.push(line.substring(lastIndex));
+    }
+
+    return (
+      <React.Fragment key={`line-${lineIdx}`}>
+        {parts}
+        {lineIdx < lines.length - 1 && <br />}
+      </React.Fragment>
+    );
+  });
+}
 
 export const TibbyMascotAvatar = () => (
   <div className="gut-chat__avatar gut-chat__avatar--tibby-mascot" aria-hidden="true">
@@ -134,86 +212,106 @@ export default function TibbyFloatingBot() {
       q === "hi" || q === "hello" || q === "hey" || q === "who are you" || q === "what is this" || q === "what do you do" || q.includes("introduce yourself");
 
     if (isGreeting) {
-      return "Hi there! I’m Tibby, your gut health guide at Third Biome. We are India’s 1st precision postbiotic brand, dedicated to direct cellular gut fueling with Biome Balance (pure GTB™ butyrate).\n\nYou can ask me about postbiotics, dosage, bloating, ingredients, or how our clinical research works!";
+      return "Hi there! I’m Tibby, your gut health & clinical research guide at Third Biome. We are India’s 1st precision postbiotic brand, dedicated to direct cellular gut fueling with Biome Balance (pure GTB™ butyrate).\n\nYou can ask me about our clinical trial evidence, scientific publications, postbiotics, dosage, bloating, or how our research works!";
     }
 
-    // 2. BRAND / WHO WE ARE
+    // 2. CLINICAL EVIDENCE / TRIALS / RCT / PROVEN / DATA
+    if (q.includes("clinically") || q.includes("proven") || q.includes("clinical") || q.includes("trial") || q.includes("evidence") || q.includes("rct") || q.includes("ctri") || q.includes("study") || q.includes("human trial") || q.includes("tested")) {
+      return "Yes, 100%! Third Biome is backed by a registered double-blind, randomized controlled trial (RCT):\n\n• Primary Endpoint: +74% statistically significant increase in fecal butyrate levels (p < 0.001) in the GTB™ active arm vs placebo.\n• Symptom Relief: Marked, rapid reduction in abdominal bloating, gas, and irregular bowel frequency within 14 days.\n• Barrier Integrity: Restored tight junction barrier defense and significantly lowered inflammatory zonulin.\n• Enteric Delivery: 99.4% of active butyrate safely bypasses destructive stomach acid.\n\nExplore our full trial methodology and data in our [Evidence & Clinical Trials](/evidence) dossier and [Scientific Publications](/scientific-publications) library!";
+    }
+
+    // 3. SCIENTIFIC PUBLICATIONS / PAPERS / RESEARCH
+    if (q.includes("publication") || q.includes("paper") || q.includes("research") || q.includes("journal") || q.includes("doi") || q.includes("read paper") || q.includes("academic") || q.includes("scientific") || q.includes("literature") || q.includes("abstract")) {
+      return "Third Biome practices open science. We publish our research and peer-reviewed studies openly in our [Scientific Publications](/scientific-publications) library:\n\n• [Paper 01: Postbiotic Strategies after Antibiotic Exposure](/scientific-publications/postbiotic-strategies-antibiotic-exposure) – Mitigating microbiome disruption and recurrent infection.\n• [Paper 02: Postbiotic Strategies in PCOS & Metabolic Health](/scientific-publications/postbiotic-strategies-pcos-adolescence) – Addressing hyperandrogenism, gut permeability, and insulin resistance.\n• [Paper 03: Targeted Butyrate in the Indian Gut Phenotype](/scientific-publications/butyrate-pcos-indian-phenotype) – Double-blind RCT on carb-dense dietary dysbiosis.\n\nEach dossier includes the full abstract, DOI, and scientific synthesis.";
+    }
+
+    // 4. ANTIBIOTICS & POST-ANTIBIOTIC RECOVERY / INFECTIONS / UTI
+    if (q.includes("antibiotic") || q.includes("infection") || q.includes("uti") || q.includes("amoxicillin") || q.includes("cipro") || q.includes("azithromycin") || q.includes("paper 01") || q.includes("post antibiotic") || q.includes("secondary infection")) {
+      return "Yes, you can safely take Biome Balance during and after antibiotics! While antibiotics wipe out over 80% of beneficial live gut bacteria (and kill standard probiotics), postbiotics are non-living bioactive metabolites.\n\nThey pass through antibiotic courses completely unharmed, actively shielding colonocytes and stopping opportunistic pathogen overgrowth. Read the clinical rationale in [Paper 01 on Antibiotic Exposure](/scientific-publications/postbiotic-strategies-antibiotic-exposure).";
+    }
+
+    // 5. PCOS, HORMONAL & METABOLIC HEALTH
+    if (q.includes("pcos") || q.includes("pcod") || q.includes("hormone") || q.includes("hormonal") || q.includes("androgen") || q.includes("insulin") || q.includes("period") || q.includes("acne") || q.includes("paper 02") || q.includes("metabolic") || q.includes("weight")) {
+      return "In women with PCOS, chronic gut barrier hyper-permeability ('leaky gut') allows bacterial endotoxins (LPS) into systemic circulation, provoking systemic inflammation, insulin resistance, and heightened ovarian androgen production.\n\nTargeted GTB™ butyrate reinforces gut tight junctions, reduces inflammatory endotoxemia, and restores metabolic signaling. Review the full peer-reviewed study in [Paper 02 on PCOS](/scientific-publications/postbiotic-strategies-pcos-adolescence).";
+    }
+
+    // 6. INDIAN DIET & MICROBIOME PHENOTYPE
+    if (q.includes("indian") || q.includes("diet") || q.includes("roti") || q.includes("rice") || q.includes("curry") || q.includes("spicy") || q.includes("carb") || q.includes("phenotype") || q.includes("paper 03") || q.includes("ferment")) {
+      return "Modern urban Indian diets are carbohydrate-heavy and frequently low in diverse fermentable fiber, leaving native gut bacteria starved of the raw substrate needed to produce butyrate. Furthermore, fragile live probiotics fail to colonize in hot climates.\n\nBiome Balance skips the fermentation bottleneck entirely by delivering pure, finished GTB™ butyrate directly to the colon cells. Read our published double-blind trial in [Paper 03 on the Indian Gut](/scientific-publications/butyrate-pcos-indian-phenotype).";
+    }
+
+    // 7. BRAND / WHO WE ARE
     if (q.includes("third biome") || q.includes("about your brand") || q.includes("about the brand") || q.includes("company") || q.includes("founder")) {
-      return "Third Biome is India’s 1st precision postbiotic brand! We formulate clinically tested, doctor-designed postbiotic solutions (like Biome Balance with GTB™) manufactured in US FDA-registered, WHO-GMP certified facilities.";
+      return "Third Biome is India’s 1st precision postbiotic brand! We formulate clinically tested, doctor-designed postbiotic solutions (like Biome Balance with GTB™) manufactured in US FDA-registered, WHO-GMP certified facilities and validated by double-blind RCT trials.";
     }
 
-    // 3. STORAGE & REFRIGERATION
+    // 8. STORAGE & REFRIGERATION
     if (q.includes("fridge") || q.includes("refrigerat") || q.includes("store") || q.includes("storage") || q.includes("temperature") || q.includes("heat") || q.includes("travel")) {
       return "No refrigeration needed! Unlike fragile live probiotics that degrade in warm weather, Biome Balance postbiotics are 100% shelf-stable and heat-resistant. Keep it in your bag, on your desk, or take it while traveling.";
     }
 
-    // 4. DOSAGE & TIMING
+    // 9. DOSAGE & TIMING
     if (q.includes("when") || q.includes("time") || q.includes("morning") || q.includes("night") || q.includes("how to take") || q.includes("how many") || q.includes("dose") || q.includes("dosage") || q.includes("capsule")) {
       return "Take 2 capsules once a day, preferably in the morning with a glass of water or breakfast. Consistency is what yields the best long-term gut barrier repair!";
     }
 
-    // 5. ANTIBIOTICS & MEDICATIONS
-    if (q.includes("antibiotic") || q.includes("medicine") || q.includes("medication") || q.includes("drug") || q.includes("prescription")) {
-      return "Yes, you can safely take Biome Balance with antibiotics! Live probiotics get wiped out by antibiotics, but postbiotics are non-living bioactive metabolites. They survive antibiotic courses and actively shield your gut lining.";
-    }
-
-    // 6. BLOATING, GAS & DIGESTION
+    // 10. BLOATING, GAS & DIGESTION
     if (q.includes("bloat") || q.includes("gas") || q.includes("flatulence") || q.includes("cramp") || q.includes("digest") || q.includes("heavy") || q.includes("burp") || q.includes("balloon")) {
       return "Live probiotics often trigger gas and bloating because bacteria ferment in your gut. Biome Balance delivers pure finished butyrate directly—zero fermentation, calming bloating and gas from within.";
     }
 
-    // 7. IBS, LEAKY GUT, ACIDITY, CONSTIPATION
-    if (q.includes("ibs") || q.includes("leaky gut") || q.includes("acidity") || q.includes("constipat") || q.includes("diarrhea") || q.includes("gut barrier") || q.includes("lining") || q.includes("stomach pain")) {
-      return "Biome Balance strengthens tight junctions in your gut lining, reducing intestinal permeability (leaky gut) and soothing inflammation. It helps normalize bowel regularity and eases chronic digestive sensitivity.";
+    // 11. IBS, LEAKY GUT, ACIDITY, CONSTIPATION, ZONULIN
+    if (q.includes("ibs") || q.includes("leaky gut") || q.includes("acidity") || q.includes("constipat") || q.includes("diarrhea") || q.includes("gut barrier") || q.includes("lining") || q.includes("zonulin") || q.includes("stomach pain") || q.includes("permeab")) {
+      return "Biome Balance delivers pure enteric GTB™ butyrate directly to lower gut colonocytes, upregulating tight junction proteins (claudin and occludin) to significantly lower serum zonulin and reduce intestinal permeability ('leaky gut'). It soothes mucosal inflammation and normalizes bowel frequency.";
     }
 
-    // 8. TIMELINE & RESULTS
+    // 12. STOMACH ACID & ENTERIC COATING
+    if (q.includes("acid") || q.includes("destroy") || q.includes("stomach") || q.includes("gastric") || q.includes("capsule") || q.includes("enteric") || q.includes("absorb")) {
+      return "Stomach acid destroys over 90% of fragile probiotics. But Biome Balance features targeted enteric-delayed release technology, achieving 99.4% intact delivery past stomach acid directly into the alkaline colon.";
+    }
+
+    // 13. TIMELINE & RESULTS
     if (q.includes("how long") || q.includes("result") || q.includes("soon") || q.includes("effect") || q.includes("work") || q.includes("when will") || q.includes("days") || q.includes("weeks")) {
       return "Most members notice easing in gas, bloating, and digestion within 7 to 14 days. Structural gut barrier repair, regular motility, and steady energy compound over 4 to 8 weeks of daily use.";
     }
 
-    // 9. POSTBIOTIC VS PROBIOTIC VS PREBIOTIC
+    // 14. POSTBIOTIC VS PROBIOTIC VS PREBIOTIC
     if (q.includes("prebiotic") || q.includes("probiotic") || q.includes("postbiotic") || q.includes("difference") || q.includes("what is a postbiotic") || q.includes("what are postbiotics")) {
       return "Here’s how it works:\n• Prebiotics = Food for bacteria (fiber)\n• Probiotics = Live bacteria (easily killed by stomach acid)\n• Postbiotics (GTB™ Butyrate) = The actual healing fuel your gut cells need.\nWe deliver the pure postbiotic directly—no guessing, no fermentation!";
     }
 
-    // 10. INGREDIENTS, VEGAN, GLUTEN, ALLERGENS & STANDARDS
-    if (q.includes("vegan") || q.includes("gluten") || q.includes("dairy") || q.includes("allergen") || q.includes("ingredient") || q.includes("contain") || q.includes("safety") || q.includes("fssai") || q.includes("fda") || q.includes("gmp")) {
+    // 15. INGREDIENTS, VEGAN, GLUTEN, ALLERGENS & STANDARDS
+    if (q.includes("vegan") || q.includes("gluten") || q.includes("dairy") || q.includes("allergen") || q.includes("ingredient") || q.includes("contain") || q.includes("safety") || q.includes("fssai") || q.includes("fda") || q.includes("gmp") || q.includes("certified")) {
       return "Biome Balance is 100% vegan, gluten-free, dairy-free, allergen-free, and non-GMO. Formulated in plant-based delayed-release capsules at a US FDA-registered, WHO-GMP certified facility and approved by FSSAI.";
     }
 
-    // 11. BRAIN FOG, MOOD & ENERGY
+    // 16. BRAIN FOG, MOOD & ENERGY
     if (q.includes("brain") || q.includes("mood") || q.includes("stress") || q.includes("energy") || q.includes("fog") || q.includes("tired") || q.includes("sleep") || q.includes("serotonin")) {
       return "Over 90% of your body’s serotonin is made in your gut! Butyrate fuels the gut lining to strengthen the gut-brain axis, soothing systemic inflammation and helping clear sluggish afternoon brain fog.";
     }
 
-    // 12. SAFETY, SIDE EFFECTS & DEPENDENCY
+    // 17. SAFETY, SIDE EFFECTS & DEPENDENCY
     if (q.includes("safe") || q.includes("side effect") || q.includes("habit") || q.includes("depend") || q.includes("long term") || q.includes("daily")) {
       return "Biome Balance is 100% non-habit forming and safe for daily, continuous wellness. Butyrate is the primary natural fuel healthy colon cells consume every day.";
     }
 
-    // 13. PRICING, BUY, ORDER, DISCOUNT & COUPON
+    // 18. PRICING, BUY, ORDER, DISCOUNT & COUPON
     if (q.includes("price") || q.includes("cost") || q.includes("buy") || q.includes("order") || q.includes("discount") || q.includes("coupon") || q.includes("offer") || q.includes("rupee") || q.includes("₹") || q.includes("shipping")) {
       return "You can get Biome Balance on our product page in 1, 2, or 3-month bundles, with free shipping across India. Use discount code WELCOME200 at checkout for ₹200 off your first order!";
     }
 
-    // 14. CLINICAL EVIDENCE / TRIALS
-    if (q.includes("evidence") || q.includes("clinical") || q.includes("trial") || q.includes("study") || q.includes("science") || q.includes("rct") || q.includes("ctri")) {
-      return "Third Biome is backed by a CTRI-registered, double-blinded randomized controlled trial (RCT) showing a +74% increase in stool butyrate in the GTB™ arm. We publish our limits, mechanisms, and findings openly.";
-    }
-
-    // 15. DOCTOR / MEDICAL ADVICE
+    // 19. DOCTOR / MEDICAL ADVICE
     if (q.includes("doctor") || q.includes("pregnant") || q.includes("pregnancy") || q.includes("disease") || q.includes("cure")) {
       return "Tibby is a wellness guide, not a doctor. If you are pregnant, nursing, or managing a medical condition, we always recommend consulting your healthcare physician before beginning any new supplement.";
     }
 
-    // 16. GENERAL GUT / HEALTH TERMS
+    // 20. GENERAL GUT / HEALTH TERMS
     if (q.includes("gut") || q.includes("colon") || q.includes("microbiome") || q.includes("health") || q.includes("stomach") || q.includes("bowel") || q.includes("poop") || q.includes("stool") || q.includes("butyrate") || q.includes("gtb") || q.includes("balance")) {
       return "Biome Balance delivers targeted enteric postbiotics (GTB™ butyrate) directly to your lower gut to repair mucosal barriers and fuel colonocytes without gastric breakdown. What specific aspect of your gut health would you like to explore?";
     }
 
-    // 17. OFF-TOPIC / UNRELATED / INVALID INPUT FALLBACK
-    return "I’m specialized in gut health, postbiotics, and Third Biome!\n\nPlease ask a question related to Biome Balance, symptoms (like bloating, gas, energy), dosage, or how postbiotics work, and I'll be happy to help!";
+    // 21. OFF-TOPIC / UNRELATED FALLBACK
+    return "I’m specialized in gut health, postbiotics, and Third Biome's clinical research!\n\nPlease ask a question related to Biome Balance, clinical trials, our scientific papers, symptoms (like bloating, gas, energy), dosage, or how postbiotics work, and I'll be happy to help!";
   };
 
   const handleAskTopic = (topic) => {
@@ -315,7 +413,7 @@ export default function TibbyFloatingBot() {
     }
   }, [isOpen]);
 
-  const visibleTopics = showMoreTopics ? PRESET_TOPICS : PRESET_TOPICS.slice(0, 5);
+  const visibleTopics = showMoreTopics ? PRESET_TOPICS : PRESET_TOPICS.slice(0, 6);
 
   return (
     <>
@@ -390,7 +488,7 @@ export default function TibbyFloatingBot() {
                     <div className="gut-chat__bubble-wrap">
                       {isTibby && <TibbyMascotAvatar />}
                       <div className={`gut-chat__bubble gut-chat__bubble--${msg.sender}`}>
-                        {msg.text}
+                        {formatTibbyMessage(msg.text)}
                       </div>
                       {!isTibby && <SunnyAvatar />}
                     </div>
