@@ -85,6 +85,7 @@ export const FOOT_COLS = [
   ["Learn", [
     ["/#system", "How it works"],
     ["/evidence", "The evidence"],
+    ["/scientific-publications", "Publications"],
     ["/about", "Our story"],
     ["/journal", "Journal"],
   ]],

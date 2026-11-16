@@ -1,75 +1,165 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useRef, useState, useEffect } from "react";
 import { IMG } from "../data/content";
-import gutMotionVideo from "../assets/gut-motion.mp4";
-import biomeProductVideo from "../assets/biome-product-video.mp4";
 
-const STORIES = [
+const INFLUENCER_STORIES = [
   {
-    id: "routine-oval",
-    type: "oval",
-    img: IMG.lifestyle,
-    alt: "Morning gut health routine",
-    tag: "Morning ritual",
-    title: "Sinkside routine",
-    desc: "1 capsule with water every morning before breakfast.",
+    id: "pooja-gowda",
+    title: "Pooja Gowda",
+    role: "Wellness & Lifestyle Creator",
+    badge: "Creator Story",
+    video: encodeURI("/assets/Influencers Video/Pooja gowda - reel.mp4"),
+    quote: "“Adding Biome Balance to my daily wellness routine made an immediate difference in bloating and daily energy.”",
+    alt: "Pooja Gowda daily gut wellness reel",
   },
   {
-    id: "capsule-video",
-    type: "video-pure",
-    img: IMG.blogCapsules,
-    video: biomeProductVideo,
-    alt: "Third Biome capsules in hand",
-    badge: "500 mg active GTB™",
+    id: "chakradhar",
+    title: "Chakradhar",
+    role: "T3B Member · 60-Day Story",
+    badge: "Member Story",
+    video: encodeURI("/assets/Influencers Video/Chakradhar.mp4"),
+    poster: IMG.patChakradhar,
+    quote: "“Within 3 weeks, bloating and post-meal sluggishness completely disappeared. My energy levels are back.”",
+    alt: "Chakradhar gut transformation story",
   },
   {
-    id: "scientist-video",
-    type: "video-portrait",
-    img: IMG.tileClinical,
-    video: gutMotionVideo,
-    alt: "Clinical science and postbiotic research",
-    badge: "Clinical Science",
-    title: "Clinical Formulation",
-    role: "Physician & Pharmacology Team",
-    quote: "“Postbiotics don't need to colonise. They deliver active butyrate directly to the colon.”",
+    id: "shwetha-jain",
+    title: "Shwetha Jain",
+    role: "Nutritionist & Wellness Advocate",
+    badge: "Nutrition Expert",
+    video: encodeURI("/assets/Influencers Video/Shwetha Jain.mp4"),
+    poster: IMG.patShweta,
+    quote: "“Biome Balance has become the non-negotiable anchor in my morning gut ritual. The clinical backing speaks for itself.”",
+    alt: "Shwetha Jain daily morning gut ritual video",
   },
   {
-    id: "split-editorial",
-    type: "split-quote",
-    topImg: IMG.duo,
-    topAlt: "Third Biome bottle on wellness counter",
-    quote: "“Pushing the boundaries on what microbial metabolisms and pathways are capable of is where their interests and their passions lie.”",
-    sourceName: "FAST COMPANY",
-    sourceSubtitle: "Innovation in Gut Biotechnology",
-    link: "/science",
+    id: "shriya-jain",
+    title: "Shriya Jain",
+    role: "Holistic Health Creator",
+    badge: "Creator Story",
+    video: encodeURI("/assets/Influencers Video/Shriya Jain.mp4"),
+    quote: "“No more trial-and-error with random gut supplements. This actually works with the microbiome’s natural rhythm.”",
+    alt: "Shriya Jain microbiome journey video",
   },
   {
-    id: "jar-detail-video",
-    type: "video-portrait",
-    img: IMG.hero,
-    video: biomeProductVideo,
-    alt: "Third Biome green glass jar detail",
-    badge: "Targeted Release",
-    title: "Micro-encapsulation",
-    role: "Formulation Science",
-    quote: "“Protective lipid matrix ensures 100% bypass of harsh stomach acid.”",
+    id: "nimish",
+    title: "Nimish",
+    role: "Biohacker & Athlete",
+    badge: "Performance",
+    video: encodeURI("/assets/Influencers Video/Nimish.mp4"),
+    quote: "“Recovery starts in the gut. Adding postbiotic butyrate improved my metabolic stamina and daily digestion.”",
+    alt: "Nimish athlete gut recovery video",
   },
   {
-    id: "member-story",
-    type: "video-portrait",
-    img: IMG.rweCalmer,
-    video: gutMotionVideo,
-    alt: "Member sharing daily gut transformation",
-    badge: "Cohort 3 Member",
-    title: "T3B Club Protocol",
-    role: "Bangalore · 30-Day Gut Cohort",
-    quote: "“Finally, a gut protocol that has real scientific backing instead of marketing hype.”",
+    id: "saakshi",
+    title: "Saakshi",
+    role: "Community Member · 30-Day Cohort",
+    badge: "T3B Cohort",
+    video: encodeURI("/assets/Influencers Video/Saakshi.mp4"),
+    quote: "“The difference in my digestion and skin clarity within a month was night and day. Truly science-backed.”",
+    alt: "Saakshi 30-day cohort experience video",
   },
 ];
+
+function ReelCard({ story, onSelect }) {
+  const videoRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Browser autoplay policy might restrict, safe to ignore
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  };
+
+  return (
+    <article
+      className="v5-story-card v5-story-card--reel"
+      key={story.id}
+      onClick={() => onSelect(story)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect(story);
+        }
+      }}
+      aria-label={`Watch story by ${story.title}`}
+    >
+      <div className="v5-story-card__reel-media">
+        <video
+          ref={videoRef}
+          src={`${story.video}#t=0.001`}
+          poster={story.poster}
+          muted
+          playsInline
+          loop
+          preload="metadata"
+          className="v5-story-card__reel-video"
+        />
+
+        {/* Gradient scrim for text readability */}
+        <div className="v5-story-card__reel-scrim" />
+
+        {/* Circular play button at top right */}
+        <button
+          type="button"
+          className="v5-story-card__play-badge"
+          aria-label={`Play story by ${story.title}`}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+        </button>
+
+        {/* Pill badge at top left */}
+        {story.badge && (
+          <span className="v5-story-card__badge">{story.badge}</span>
+        )}
+
+        {/* Overlay info at bottom */}
+        <div className="v5-story-card__reel-overlay">
+          <h3 className="v5-story-card__name">{story.title}</h3>
+          <span className="v5-story-card__role">{story.role}</span>
+          {story.quote && (
+            <p className="v5-story-card__preview-quote">{story.quote}</p>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export default function StoriesSection() {
   const trackRef = useRef(null);
   const [activeStory, setActiveStory] = useState(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setActiveStory(null);
+      }
+    };
+    if (activeStory) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeStory]);
 
   const scrollTrack = (direction) => {
     if (!trackRef.current) return;
@@ -108,116 +198,20 @@ export default function StoriesSection() {
         </div>
 
         <div className="v5-stories__track" ref={trackRef}>
-          {STORIES.map((story) => {
-            if (story.type === "oval") {
-              return (
-                <article className="v5-story-card v5-story-card--oval" key={story.id}>
-                  <div className="v5-story-card__oval-frame">
-                    <img src={story.img} alt={story.alt} loading="lazy" />
-                    <div className="v5-story-card__overlay">
-                      <span className="v5-story-card__pill-tag">{story.tag}</span>
-                      <h4>{story.title}</h4>
-                      <p>{story.desc}</p>
-                    </div>
-                  </div>
-                </article>
-              );
-            }
-
-            if (story.type === "split-quote") {
-              return (
-                <article className="v5-story-card v5-story-card--split" key={story.id}>
-                  <div className="v5-story-card__split-top">
-                    <img src={story.topImg} alt={story.topAlt} loading="lazy" />
-                  </div>
-                  <div className="v5-story-card__split-bottom">
-                    <div className="v5-story-card__quote-icon" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                      </svg>
-                    </div>
-                    <p className="v5-story-card__quote-text">{story.quote}</p>
-                    <div className="v5-story-card__quote-foot">
-                      <div>
-                        <strong className="v5-story-card__source">{story.sourceName}</strong>
-                        <span className="v5-story-card__source-sub">{story.sourceSubtitle}</span>
-                      </div>
-                      <Link to={story.link} className="v5-story-card__link-btn" aria-label="Read clinical evidence">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="7" y1="17" x2="17" y2="7" />
-                          <polyline points="7 7 17 7 17 17" />
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              );
-            }
-
-            if (story.type === "video-pure") {
-              return (
-                <article
-                  className="v5-story-card v5-story-card--pure"
-                  key={story.id}
-                  onClick={() => setActiveStory(story)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setActiveStory(story); }}
-                >
-                  <div className="v5-story-card__pure-media">
-                    <img src={story.img} alt={story.alt} loading="lazy" />
-                    <button
-                      type="button"
-                      className="v5-story-card__play-badge"
-                      aria-label="Play story video"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="5 3 19 12 5 21 5 3" />
-                      </svg>
-                    </button>
-                    {story.badge && <span className="v5-story-card__badge">{story.badge}</span>}
-                  </div>
-                </article>
-              );
-            }
-
-            return (
-              <article
-                className="v5-story-card v5-story-card--video"
-                key={story.id}
-                onClick={() => setActiveStory(story)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setActiveStory(story); }}
-              >
-                <div className="v5-story-card__media">
-                  <img src={story.img} alt={story.alt} loading="lazy" />
-                  <button
-                    type="button"
-                    className="v5-story-card__play-badge"
-                    aria-label={`Play story by ${story.title}`}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                  </button>
-                  <span className="v5-story-card__badge">{story.badge}</span>
-                </div>
-                <div className="v5-story-card__content">
-                  <h3 className="v5-story-card__name">{story.title}</h3>
-                  <span className="v5-story-card__role">{story.role}</span>
-                  <p className="v5-story-card__preview-quote">{story.quote}</p>
-                </div>
-              </article>
-            );
-          })}
+          {INFLUENCER_STORIES.map((story) => (
+            <ReelCard
+              key={story.id}
+              story={story}
+              onSelect={setActiveStory}
+            />
+          ))}
         </div>
       </div>
 
       {/* Video Modal Preview */}
       {activeStory && (
         <div className="v5-story-modal-scrim" onClick={() => setActiveStory(null)}>
-          <div className="v5-story-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="v5-story-modal v5-story-modal--reel" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               className="v5-story-modal__close"
@@ -226,25 +220,25 @@ export default function StoriesSection() {
             >
               ✕
             </button>
-            <div className="v5-story-modal__video-wrap">
-              {activeStory.video ? (
-                <video
-                  src={activeStory.video}
-                  autoPlay
-                  controls
-                  playsInline
-                  className="v5-story-modal__video"
-                  poster={activeStory.img}
-                />
-              ) : (
-                <img src={activeStory.img} alt={activeStory.alt} className="v5-story-modal__fallback-img" />
-              )}
+            <div className="v5-story-modal__video-wrap v5-story-modal__video-wrap--reel">
+              <video
+                src={activeStory.video}
+                autoPlay
+                controls
+                playsInline
+                className="v5-story-modal__video"
+                poster={activeStory.poster}
+              />
             </div>
             <div className="v5-story-modal__info">
-              <span className="v5-story-card__badge">{activeStory.badge}</span>
+              {activeStory.badge && (
+                <span className="v5-story-card__badge">{activeStory.badge}</span>
+              )}
               <h3>{activeStory.title}</h3>
               <p className="v5-story-modal__role">{activeStory.role}</p>
-              <p className="v5-story-modal__quote">{activeStory.quote}</p>
+              {activeStory.quote && (
+                <p className="v5-story-modal__quote">{activeStory.quote}</p>
+              )}
             </div>
           </div>
         </div>

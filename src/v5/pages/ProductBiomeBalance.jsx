@@ -61,6 +61,177 @@ const PDP_PLANS = [
 const PRODUCT_CAROUSEL_VIDEO = biomeProductVideo;
 const GALLERY = [IMG.hero, IMG.skuPostbiotics, IMG.skuClinical, IMG.skuResults, PRODUCT_CAROUSEL_VIDEO];
 
+const DR_PRAKRITI_VIDEO = encodeURI("/assets/Influencers Video/Dr. Prakriti yadav.mp4");
+
+function PdpExpertVideo() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsModalOpen(false);
+      }
+    };
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isModalOpen]);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.muted = false;
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(() => {
+        setIsPlaying(true);
+      });
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (!isPlaying && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isPlaying && videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  };
+
+  return (
+    <>
+      <div
+        className={`pdp-expert-placeholder ${isPlaying ? "pdp-expert-placeholder--playing" : ""}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={togglePlay}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            togglePlay();
+          }
+        }}
+        aria-label="Play Dr. Prakriti Yadav expert explanation video"
+      >
+        <video
+          ref={videoRef}
+          src={`${DR_PRAKRITI_VIDEO}#t=0.001`}
+          muted={!isPlaying}
+          controls={isPlaying}
+          playsInline
+          loop={!isPlaying}
+          preload="metadata"
+          className="pdp-expert-video"
+          onEnded={() => setIsPlaying(false)}
+          onPause={() => {
+            if (videoRef.current?.seeking) return;
+            setIsPlaying(false);
+          }}
+          onPlay={() => setIsPlaying(true)}
+        />
+
+        {!isPlaying && (
+          <>
+            <div className="pdp-expert-placeholder__scrim" />
+
+            <div className="pdp-expert-placeholder__top-badge">
+              <span className="pdp-expert-badge">Clinical Physician Review</span>
+            </div>
+
+            <div className="pdp-expert-placeholder__label">
+              <button
+                type="button"
+                className="pdp-expert-placeholder__play"
+                aria-label="Play Dr. Prakriti Yadav video"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay();
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+              </button>
+              <div style={{ flex: 1 }}>
+                <b>Dr. Prakriti Yadav, MD</b>
+                <small>Physician explanation · Targeted postbiotic mechanism</small>
+              </div>
+              <button
+                type="button"
+                className="pdp-expert-placeholder__expand-btn"
+                aria-label="Expand video modal"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (videoRef.current) {
+                    videoRef.current.pause();
+                    setIsPlaying(false);
+                  }
+                  setIsModalOpen(true);
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                </svg>
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* 9:16 Vertical Modal Reel Player */}
+      {isModalOpen && (
+        <div className="v5-story-modal-scrim" onClick={() => setIsModalOpen(false)}>
+          <div className="v5-story-modal v5-story-modal--reel" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="v5-story-modal__close"
+              onClick={() => setIsModalOpen(false)}
+              aria-label="Close video"
+            >
+              ✕
+            </button>
+            <div className="v5-story-modal__video-wrap v5-story-modal__video-wrap--reel">
+              <video
+                src={DR_PRAKRITI_VIDEO}
+                autoPlay
+                controls
+                playsInline
+                className="v5-story-modal__video"
+              />
+            </div>
+            <div className="v5-story-modal__info">
+              <span className="v5-story-card__badge">Clinical Physician Review</span>
+              <h3>Dr. Prakriti Yadav, MD</h3>
+              <p className="v5-story-modal__role">Physician & Gut Health Specialist</p>
+              <p className="v5-story-modal__quote">
+                “Targeted postbiotics bypass gut breakdown to deliver real mucosal repair where probiotics often fall short.”
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function ProductBiomeBalance() {
   const { add, busy } = useCart();
   const [thumb, setThumb] = useState(0);
@@ -464,10 +635,7 @@ export default function ProductBiomeBalance() {
                 <div><h3>The repair pays off</h3><p>Lining repair compounds over a season. Most members choose to keep the protocol going, which is why we recommend three months.</p></div>
               </li>
             </ol>
-            <div className="pdp-expert-placeholder">
-              <Shot className="imgfill" src={IMG.microbes} alt="Abstract microbiome illustration for a future expert science video" />
-              <div className="pdp-expert-placeholder__label"><span className="pdp-expert-placeholder__play" aria-hidden="true">▶</span><span><b>Expert video coming soon</b><small>Captioned explanation of the postbiotic mechanism</small></span></div>
-            </div>
+            <PdpExpertVideo />
           </div>
           <p className="pdp-experience-timeline__note">Experience varies. These milestones describe member-reported expectations and the product mechanism; they are not separate clinical-trial timepoints. The registered RCT reported findings over 45 days. <Link to="/evidence#clinical-trial">See clinical evidence →</Link></p>
         </div>

@@ -5,6 +5,8 @@ import HomeV3 from "./v5/pages/HomeV3";
 import ProductBiomeBalance from "./v5/pages/ProductBiomeBalance";
 import Evidence from "./v5/pages/Evidence";
 import Science from "./v5/pages/Science";
+import ScientificPublications from "./v5/pages/ScientificPublications";
+import PublicationDetail from "./v5/pages/PublicationDetail";
 import CaseStudies from "./v5/pages/CaseStudies";
 import About from "./v5/pages/About";
 import Journal from "./v5/pages/Journal";
@@ -23,6 +25,9 @@ import OrderRedirect from "./v5/pages/OrderRedirect";
 import PrivacyPolicy from "./v5/pages/PrivacyPolicy";
 import TermsOfService from "./v5/pages/TermsOfService";
 import NotFound from "./v5/pages/NotFound";
+import AdminLogin from "./v5/pages/admin/AdminLogin";
+import PublicationList from "./v5/pages/admin/PublicationList";
+import PublicationEditor from "./v5/pages/admin/PublicationEditor";
 
 function App() {
   return (
@@ -38,6 +43,10 @@ function App() {
         <Route path="/products/:categorySlug" element={<Navigate to="/products/biome-balance" replace />} />
         <Route path="/shop" element={<Navigate to="/products/biome-balance" replace />} />
         <Route path="/science" element={<Science />} />
+        <Route path="/scientific-publications" element={<ScientificPublications />} />
+        <Route path="/scientific-publications/:slug" element={<PublicationDetail />} />
+        <Route path="/publications" element={<Navigate to="/scientific-publications" replace />} />
+        <Route path="/research" element={<Navigate to="/scientific-publications" replace />} />
         <Route path="/blogs" element={<Navigate to="/journal" replace />} />
         <Route path="/faq" element={<Navigate to="/#faq" replace />} />
         <Route path="/gut-scoring/interactive-quiz" element={<Navigate to="/quiz" replace />} />
@@ -64,6 +73,13 @@ function App() {
         {/* legal */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+
+        {/* publication admin cms */}
+        <Route path="/admin" element={<Navigate to="/admin/publications" replace />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/publications" element={<PublicationList />} />
+        <Route path="/admin/publications/new" element={<PublicationEditor />} />
+        <Route path="/admin/publications/edit/:id" element={<PublicationEditor />} />
 
         <Route path="*" element={<NotFound />} />
       </Route>
