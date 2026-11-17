@@ -7,5 +7,5 @@ Disallow: /order-confirmation/
 Disallow: /payment/
 
 # Canonical Sitemap Reference
-Sitemap: https://www.thirdbiome.com/sitemap.xml
+Sitemap: https://thirdbiome.com/sitemap.xml
 
