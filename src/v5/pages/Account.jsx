@@ -114,6 +114,9 @@ function OrderCard({ order, onReorder, reorderBusy }) {
               {" "}· Order total <b style={{ color: "var(--ink)" }}>{inr(total)}</b>
             </>
           )}
+          {(order.paymentMethod === "cod" || order.payment_method === "cod" || order.isCod) && (
+            <> · <span style={{ color: "var(--green-d)", fontWeight: 600 }}>Cash on Delivery</span></>
+          )}
           {s === "delivered" && (
             <>
               {" "}·{" "}
@@ -142,6 +145,9 @@ function OrderCard({ order, onReorder, reorderBusy }) {
                 <>
                   Order total <b style={{ color: "var(--ink)" }}>{inr(total)}</b>
                 </>
+              )}
+              {(order.paymentMethod === "cod" || order.payment_method === "cod" || order.isCod) && (
+                <> · <span style={{ color: "var(--green-d)", fontWeight: 600 }}>Cash on Delivery</span></>
               )}
               {awb && <> · AWB {awb}</>}
             </p>

@@ -183,11 +183,15 @@ const OrderDetails = () => {
                                 ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
                                 : "Pending"}
                         </span>
-                        {order.paymentStatus === 'paid' && (
+                        {order.paymentStatus === 'paid' ? (
                             <span className="px-4 py-1.5 rounded-full text-sm font-bold bg-gray-100 text-gray-700 border border-gray-200">
                                 Paid
                             </span>
-                        )}
+                        ) : (order.paymentMethod === 'cod' || order.payment_method === 'cod' || order.isCod) ? (
+                            <span className="px-4 py-1.5 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                Cash on Delivery
+                            </span>
+                        ) : null}
                     </div>
                 </div>
 
