@@ -23,6 +23,10 @@ const OrderConfirmation = () => {
   useEffect(() => {
     const verifyPayment = async () => {
       if (!orderNumber) return;
+      const params = new URLSearchParams(location.search);
+      const isCodFromParam = params.get("method") === "cod";
+      const lastMethod = sessionStorage.getItem("lastPaymentMethod");
+      if (isCodFromParam || lastMethod === "cod") return;
       try {
         await payuService.verify(orderNumber);
       } catch (err) {

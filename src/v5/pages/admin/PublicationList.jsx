@@ -130,6 +130,24 @@ export default function PublicationList() {
             </div>
           </div>
 
+          {/* Admin Navigation Tabs */}
+          <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "1px solid var(--line)", paddingBottom: "12px" }}>
+            <Link
+              to="/admin/publications"
+              className="btn btn--dark"
+              style={{ fontSize: "0.88rem", padding: "8px 18px" }}
+            >
+              📄 Scientific Publications
+            </Link>
+            <Link
+              to="/admin/checkout-settings"
+              className="btn btn--ghost"
+              style={{ fontSize: "0.88rem", padding: "8px 18px" }}
+            >
+              💳 Checkout &amp; Payment Controls
+            </Link>
+          </div>
+
           {actionMessage && (
             <div className="admin-flash-alert" role="status">
               <span>✓ {actionMessage}</span>

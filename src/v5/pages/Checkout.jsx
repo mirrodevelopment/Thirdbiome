@@ -10,13 +10,20 @@ import { Arr } from "../components/ui";
 import Seo from "../components/Seo";
 import { track, PIXEL_PRODUCT } from "../lib/analytics";
 import { showToast } from "../../utils/toast";
-import { getCart, generateSessionId } from "../../services/cartService";
+import { getCart, generateSessionId, clearCart as apiClearCart } from "../../services/cartService";
 import { createOrder } from "../../services/orderService";
 import { payuService } from "../../services/paymentService";
 import { postToPayU } from "../../utils/payment";
 import { logout } from "../../redux/slices/AuthSlice";
+import { clearCart as clearCartAction } from "../../redux/slices/CartSlice";
 import couponService from "../../services/couponService";
 import { inr, FREE_SHIP_THRESHOLD } from "../data/content";
+import {
+  getCheckoutSettings,
+  checkCodEligibility,
+  CHECKOUT_SETTINGS_EVENT,
+  DEFAULT_CHECKOUT_SETTINGS,
+} from "../../services/checkoutSettingsService";
 
 const countryOptions = [
   { value: "US", label: "United States" },
@@ -123,6 +130,8 @@ export default function Checkout() {
     phone: "",
   });
   const [shipping, setShipping] = useState("ship1");
+  const [paymentMethod, setPaymentMethod] = useState("payu");
+  const [checkoutSettings, setCheckoutSettings] = useState(DEFAULT_CHECKOUT_SETTINGS);
   const [billing, setBilling] = useState({
     country: "IN",
     firstName: "",
@@ -145,6 +154,17 @@ export default function Checkout() {
   const couponCarried = useRef(false);
 
   // Restore form data from sessionStorage on mount
+  useEffect(() => {
+    getCheckoutSettings().then((s) => {
+      if (s) setCheckoutSettings(s);
+    });
+    const handleSettingsUpdate = (e) => {
+      if (e.detail) setCheckoutSettings(e.detail);
+    };
+    window.addEventListener(CHECKOUT_SETTINGS_EVENT, handleSettingsUpdate);
+    return () => window.removeEventListener(CHECKOUT_SETTINGS_EVENT, handleSettingsUpdate);
+  }, []);
+
   useEffect(() => {
     const saved = sessionStorage.getItem(CHECKOUT_FORM_KEY);
     if (saved) {
@@ -178,7 +198,15 @@ export default function Checkout() {
   const shippingFee =
     shippingMethods.find((m) => m.id === shipping)?.price || 0;
   const tax = 0; // No tax
-  const total = subtotal + shippingFee + tax - discountAmount;
+  const codEligibility = checkCodEligibility(
+    checkoutSettings,
+    subtotal - discountAmount
+  );
+  const codFee =
+    paymentMethod === "cod" && codEligibility.eligible
+      ? Number(checkoutSettings.codFee || 0)
+      : 0;
+  const total = subtotal + shippingFee + tax - discountAmount + codFee;
 
   // Fire InitiateCheckout once, on mount, when the cart is non-empty
   useEffect(() => {
@@ -320,7 +348,9 @@ export default function Checkout() {
         totalAmount: total,
         couponCode: appliedCoupon?.code || null,
         discountAmount: discountAmount || 0,
-        paymentMethod: "payu",
+        paymentMethod: paymentMethod,
+        isCod: paymentMethod === "cod",
+        codFee: codFee,
         shippingAddress: {
           firstName: delivery.firstName,
           lastName: delivery.lastName,
@@ -335,22 +365,52 @@ export default function Checkout() {
       };
 
       const response = await createOrder(orderData);
+      const createdOrderId =
+        response.data?.orderId ||
+        response.data?.data?.orderId ||
+        response.data?.id ||
+        response.data?.data?._id ||
+        response.data?.order?._id;
+      const createdOrderNumber =
+        response.data?.orderNumber ||
+        response.data?.data?.orderNumber ||
+        response.data?.order?.orderNumber;
+
       try {
-        const createdOrderId =
-          response.data?.orderId ||
-          response.data?.data?.orderId ||
-          response.data?.id ||
-          response.data?.data?._id ||
-          response.data?.order?._id;
-        const createdOrderNumber =
-          response.data?.orderNumber ||
-          response.data?.data?.orderNumber ||
-          response.data?.order?.orderNumber;
         if (createdOrderId)
           sessionStorage.setItem("lastOrderId", String(createdOrderId));
         if (createdOrderNumber)
           sessionStorage.setItem("lastOrderNumber", String(createdOrderNumber));
+        sessionStorage.setItem("lastPaymentMethod", paymentMethod);
       } catch { /* non-fatal */ }
+
+      // Cash On Delivery handling (direct confirmation without gateway redirect)
+      if (paymentMethod === "cod") {
+        try {
+          dispatch(clearCartAction());
+          await apiClearCart().catch(() => {});
+        } catch { /* non-fatal */ }
+
+        try {
+          sessionStorage.removeItem("t3b_pending_coupon");
+        } catch { /* non-fatal */ }
+
+        track("Purchase", {
+          ...PIXEL_PRODUCT,
+          value: total,
+          currency: "INR",
+          num_items: cart.length,
+          payment_type: "Cash on Delivery",
+        });
+
+        showToast.success("Order placed successfully with Cash on Delivery!");
+        navigate(
+          `/order-confirmation/${createdOrderNumber || createdOrderId}?method=cod&email=${encodeURIComponent(
+            currentEmail
+          )}`
+        );
+        return;
+      }
 
       // Initialize payment and submit to PayU
       {
@@ -599,8 +659,15 @@ export default function Checkout() {
               {/* Payment */}
               <div className="v5-cohead"><h2>Payment</h2></div>
               <p className="v5-conote" style={{ marginTop: 0 }}>All transactions are secure and encrypted.</p>
-              <div className="v5-payline v5-payline--on">
-                <input type="radio" name="payment" value="payu" checked readOnly />
+
+              <label className={`v5-payline${paymentMethod === "payu" ? " v5-payline--on" : ""}`} style={{ cursor: "pointer", marginBottom: "10px" }}>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="payu"
+                  checked={paymentMethod === "payu"}
+                  onChange={() => setPaymentMethod("payu")}
+                />
                 <span className="v5-payline__txt">
                   <b>PayU (UPI, Cards, NetBanking, Wallets)</b>
                   <span>After clicking 'Pay now', you will be redirected to PayU to complete your purchase securely.</span>
@@ -611,7 +678,51 @@ export default function Checkout() {
                   <svg width="20" height="12" viewBox="0 0 20 12" fill="none"><circle cx="7" cy="6" r="4" fill="#EB001B" /><circle cx="13" cy="6" r="4" fill="#F79E1B" /><path d="M7 2C8.5 4 8.5 8 7 10C8.5 8 8.5 4 7 2Z" fill="#FF5F00" /></svg>
                   <svg width="20" height="12" viewBox="0 0 20 12" fill="none"><rect width="20" height="12" rx="2" fill="#2563EB" /><text x="10" y="8" textAnchor="middle" fill="white" fontSize="4" fontWeight="bold">NET</text></svg>
                 </span>
-              </div>
+              </label>
+
+              {checkoutSettings.isCodEnabled && (
+                <label
+                  className={`v5-payline${paymentMethod === "cod" ? " v5-payline--on" : ""}${!codEligibility.eligible ? " v5-payline--disabled" : ""}`}
+                  style={{
+                    cursor: codEligibility.eligible ? "pointer" : "not-allowed",
+                    opacity: codEligibility.eligible ? 1 : 0.65,
+                    marginBottom: "10px",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="cod"
+                    checked={paymentMethod === "cod"}
+                    disabled={!codEligibility.eligible}
+                    onChange={() => codEligibility.eligible && setPaymentMethod("cod")}
+                  />
+                  <span className="v5-payline__txt">
+                    <span style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <b>Cash on Delivery (COD)</b>
+                      {Number(checkoutSettings.codFee) === 0 ? (
+                        <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "var(--panel)", color: "var(--green-d)" }}>
+                          FREE
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "var(--panel)", color: "var(--ink-soft)" }}>
+                          + {inr(checkoutSettings.codFee)} fee
+                        </span>
+                      )}
+                    </span>
+                    <span>
+                      {codEligibility.eligible
+                        ? (checkoutSettings.codNotice || "Pay in cash or UPI at your doorstep when your package arrives.")
+                        : codEligibility.reason}
+                    </span>
+                  </span>
+                  <span className="v5-payline__brands" aria-hidden="true">
+                    <span style={{ fontSize: "0.72rem", fontWeight: 700, padding: "4px 8px", background: "var(--panel)", borderRadius: "6px", border: "1px solid var(--line)", whiteSpace: "nowrap" }}>
+                      💵 CASH / UPI
+                    </span>
+                  </span>
+                </label>
+              )}
 
               {/* Billing address */}
               <label className="v5-checkline" style={{ marginTop: "18px" }}>
@@ -680,7 +791,7 @@ export default function Checkout() {
                 </div>
               )}
 
-              {/* Pay now */}
+              {/* Pay now / Place order */}
               <button
                 type="button"
                 className="btn btn--dark"
@@ -688,7 +799,12 @@ export default function Checkout() {
                 onClick={handlePayNow}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Processing..." : "Pay Now with PayU"} <Arr />
+                {isSubmitting
+                  ? "Processing..."
+                  : paymentMethod === "cod"
+                  ? `Place Order · Cash on Delivery (${inr(total)})`
+                  : `Pay Now with PayU (${inr(total)})`}{" "}
+                <Arr />
               </button>
               <p className="v5-conote" style={{ marginTop: "16px" }}>
                 One or more items in your cart is a deferred or recurring purchase. By
@@ -776,6 +892,12 @@ export default function Checkout() {
                   <span>{inr(shippingFee)}</span>
                 )}
               </div>
+              {paymentMethod === "cod" && codFee > 0 && (
+                <div className="v5-sumrow">
+                  <span>COD Handling Fee</span>
+                  <span>{inr(codFee)}</span>
+                </div>
+              )}
               <div className="v5-sumrow v5-sumrow--total">
                 <span>Total</span>
                 <span>{inr(total)}</span>

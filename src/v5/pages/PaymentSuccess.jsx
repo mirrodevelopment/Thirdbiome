@@ -62,6 +62,12 @@ export default function PaymentSuccess() {
   useEffect(() => {
     const doVerify = async () => {
       if (!orderNumber) return;
+      const isCod = params.get("method") === "cod" || sessionStorage.getItem("lastPaymentMethod") === "cod";
+      if (isCod) {
+        setPaymentStatus("cod");
+        setVerifying(false);
+        return;
+      }
       try {
         setVerifying(true);
         const res = await payuService.verify(orderNumber);

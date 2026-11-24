@@ -9,6 +9,8 @@ import { createOrder } from "../../services/orderService";
 import { payuService } from "../../services/paymentService";
 import { postToPayU } from "../../utils/payment";
 import { logout } from "../../redux/slices/AuthSlice";
+import { clearCart as clearCartAction } from "../../redux/slices/CartSlice";
+import { clearCart as apiClearCart } from "../../services/cartService";
 import couponService from "../../services/couponService";
 import Logo from "../../assets/thirdbio.webp";
 import { FiShoppingBag } from "react-icons/fi";
@@ -758,11 +760,20 @@ const Checkout = () => {
                 All transactions are secure and encrypted.
               </p>
 
-              <div className="border border-green-500 bg-green-50 rounded-lg p-4">
+              <div
+                onClick={() => setPayment("payu")}
+                className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                  payment === "payu"
+                    ? "border-green-500 bg-green-50"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
                 <div className="flex items-start gap-3">
                   <div className="flex items-center mt-1">
-                    <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                      payment === "payu" ? "bg-green-600" : "border border-gray-300"
+                    }`}>
+                      {payment === "payu" && <div className="w-2 h-2 bg-white rounded-full"></div>}
                     </div>
                   </div>
 
@@ -887,6 +898,45 @@ const Checkout = () => {
                         to complete your purchase securely.
                       </p>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cash On Delivery Option */}
+              <div
+                onClick={() => setPayment("cod")}
+                className={`border rounded-lg p-4 cursor-pointer transition-all mt-3 ${
+                  payment === "cod"
+                    ? "border-green-500 bg-green-50"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex items-center mt-1">
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                      payment === "cod" ? "bg-green-600" : "border border-gray-300"
+                    }`}>
+                      {payment === "cod" && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                    </div>
+                  </div>
+
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">
+                          Cash On Delivery (COD)
+                        </span>
+                        <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">
+                          FREE
+                        </span>
+                      </div>
+                      <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                        💵 Cash / UPI on Delivery
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-2">
+                      Pay with cash or UPI at your doorstep when your package arrives.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1110,7 +1160,8 @@ const Checkout = () => {
                       totalAmount: total,
                       couponCode: appliedCoupon?.code || null,
                       discountAmount: discountAmount || 0,
-                      paymentMethod: "payu",
+                      paymentMethod: payment,
+                      isCod: payment === "cod",
                       shippingAddress: {
                         firstName: delivery.firstName,
                         lastName: delivery.lastName,
@@ -1125,17 +1176,18 @@ const Checkout = () => {
                     };
 
                     const response = await createOrder(orderData);
+                    const createdOrderId =
+                      response.data?.orderId ||
+                      response.data?.data?.orderId ||
+                      response.data?.id ||
+                      response.data?.data?._id ||
+                      response.data?.order?._id;
+                    const createdOrderNumber =
+                      response.data?.orderNumber ||
+                      response.data?.data?.orderNumber ||
+                      response.data?.order?.orderNumber;
+
                     try {
-                      const createdOrderId =
-                        response.data?.orderId ||
-                        response.data?.data?.orderId ||
-                        response.data?.id ||
-                        response.data?.data?._id ||
-                        response.data?.order?._id;
-                      const createdOrderNumber =
-                        response.data?.orderNumber ||
-                        response.data?.data?.orderNumber ||
-                        response.data?.order?.orderNumber;
                       if (createdOrderId)
                         sessionStorage.setItem(
                           "lastOrderId",
@@ -1146,7 +1198,28 @@ const Checkout = () => {
                           "lastOrderNumber",
                           String(createdOrderNumber)
                         );
+                      sessionStorage.setItem("lastPaymentMethod", payment);
                     } catch { }
+
+                    // Cash on Delivery direct flow
+                    if (payment === "cod") {
+                      try {
+                        dispatch(clearCartAction());
+                        await apiClearCart().catch(() => {});
+                      } catch { }
+
+                      try {
+                        sessionStorage.removeItem("t3b_pending_coupon");
+                      } catch { }
+
+                      showToast.success("Order placed successfully with Cash on Delivery!");
+                      navigate(
+                        `/order-confirmation/${createdOrderNumber || createdOrderId}?method=cod&email=${encodeURIComponent(
+                          currentEmail
+                        )}`
+                      );
+                      return;
+                    }
 
                     // Initialize payment and submit to PayU
                     {
@@ -1205,7 +1278,11 @@ const Checkout = () => {
                 disabled={isSubmitting}
                 className="w-full py-4 bg-[#64796c] text-white rounded-lg font-semibold text-lg hover:bg-[#134a4e] transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed duration-300 cursor-pointer"
               >
-                {isSubmitting ? "Processing..." : "Pay Now with PayU"}
+                {isSubmitting
+                  ? "Processing..."
+                  : payment === "cod"
+                  ? `Place Order · Cash on Delivery (₹${total.toFixed(2)})`
+                  : `Pay Now with PayU (₹${total.toFixed(2)})`}
               </button>
               <div className="text-sm text-gray-500 mb-2 mt-4">
                 One or more items in your cart is a deferred or recurring

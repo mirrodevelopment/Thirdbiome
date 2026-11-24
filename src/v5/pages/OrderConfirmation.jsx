@@ -38,13 +38,18 @@ export default function OrderConfirmation() {
         setLoading(true);
         // Best-effort: confirm the payment with the gateway BEFORE reading the
         // order, so the stored paymentStatus we gate the UI on is up to date.
-        try {
-          await payuService.verify(orderNumber);
-        } catch {
-          // verification failure is non-fatal, the order status still gates the UI
+        // Skip PayU verification for Cash on Delivery orders!
+        const params = new URLSearchParams(location.search);
+        const isCodFromParam = params.get("method") === "cod";
+        const lastMethod = sessionStorage.getItem("lastPaymentMethod");
+        if (!isCodFromParam && lastMethod !== "cod") {
+          try {
+            await payuService.verify(orderNumber);
+          } catch {
+            // verification failure is non-fatal, the order status still gates the UI
+          }
         }
         // Get guest email from query param if present
-        const params = new URLSearchParams(location.search);
         const guestEmail = params.get("email");
         const response = await getOrderByNumber(orderNumber, guestEmail);
         if (!cancelled) setOrder(response.data);
@@ -91,12 +96,28 @@ export default function OrderConfirmation() {
     );
   }
 
+  // Check for Cash on Delivery
+  const queryParams = new URLSearchParams(location.search);
+  const isCod =
+    order.paymentMethod === "cod" ||
+    order.order?.paymentMethod === "cod" ||
+    order.isCod === true ||
+    order.is_cod === true ||
+    queryParams.get("method") === "cod" ||
+    sessionStorage.getItem("lastPaymentMethod") === "cod";
+
   // Resolve payment status, gate the success UI on it rather than assuming paid.
   const paymentStatus =
     order.paymentStatus || order.order?.paymentStatus || order.status || null;
-  const isPaid = paymentStatus === "paid";
-  const isFailed = ["failed", "cancelled", "canceled"].includes(paymentStatus);
-  const statusLabel = isPaid ? "Confirmed" : isFailed ? "Payment failed" : "Payment pending";
+  const isPaid = paymentStatus === "paid" || isCod;
+  const isFailed = !isCod && ["failed", "cancelled", "canceled"].includes(paymentStatus);
+  const statusLabel = isCod
+    ? "Cash on Delivery"
+    : isPaid
+    ? "Confirmed"
+    : isFailed
+    ? "Payment failed"
+    : "Payment pending";
 
   // Calculate totals, prefer the order's stored total, fall back to item sum.
   const subtotal = order.items?.reduce(
@@ -108,14 +129,20 @@ export default function OrderConfirmation() {
 
   return (
     <>
-      <Seo title={isPaid ? "Order confirmed" : "Order status"} />
+      <Seo title={isPaid || isCod ? "Order confirmed" : "Order status"} />
       <section className="sheet v5-page" data-screen-label="Order confirmed">
         <div className="wrap">
           <span className="eyebrow">
-            {isPaid ? "Order confirmed" : isFailed ? "Payment failed" : "Order received"}
+            {isCod
+              ? "Order confirmed · Cash on Delivery"
+              : isPaid
+              ? "Order confirmed"
+              : isFailed
+              ? "Payment failed"
+              : "Order received"}
           </span>
           <h1>
-            {isPaid ? (
+            {isPaid || isCod ? (
               <>Thank you for your <em>order!</em></>
             ) : isFailed ? (
               <>Payment <em>failed.</em></>
@@ -124,7 +151,9 @@ export default function OrderConfirmation() {
             )}
           </h1>
           <p>
-            {isPaid
+            {isCod
+              ? `Done! Your order is placed with Cash on Delivery. Please keep ₹${total.toFixed(2)} ready in cash or UPI at the time of delivery. Our team will verify and dispatch your order shortly.`
+              : isPaid
               ? "Done! Your gut’s going to be so proud of you. Our manager will contact you within 15 minutes."
               : isFailed
               ? "Your payment didn't go through. Please retry from your cart or contact support@thirdbiome.com."
@@ -147,7 +176,7 @@ export default function OrderConfirmation() {
               </div>
               <div className="v5-track">
                 {TRACK_STEPS.map((label, i) => {
-                  const done = i === 0 && isPaid;
+                  const done = i === 0 && (isPaid || isCod);
                   return (
                     <div className={`v5-track__step${done ? " done" : ""}`} key={label}>
                       <div className="v5-track__dot">{done ? <DotCheck /> : i + 1}</div>
@@ -158,7 +187,28 @@ export default function OrderConfirmation() {
               </div>
             </div>
 
-            {!isPaid && (
+            {isCod ? (
+              <div
+                style={{
+                  marginTop: "18px",
+                  borderRadius: "var(--r)",
+                  padding: "16px 20px",
+                  background: "color-mix(in srgb, var(--green-d) 8%, var(--panel))",
+                  border: "1px solid color-mix(in srgb, var(--green-d) 30%, var(--line))",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                  <span style={{ fontSize: "1.1rem" }}>💵</span>
+                  <strong style={{ fontSize: ".92rem", color: "var(--green-d)" }}>
+                    Cash On Delivery Order Confirmed
+                  </strong>
+                </div>
+                <p style={{ fontSize: ".86rem", color: "var(--ink-soft)", margin: 0, lineHeight: 1.5 }}>
+                  Amount payable upon arrival: <b style={{ color: "var(--ink)" }}>₹{total.toFixed(2)}</b>.
+                  Our delivery partner accepts both cash and UPI QR scan payments at your doorstep.
+                </p>
+              </div>
+            ) : !isPaid && (
               <div
                 style={{
                   marginTop: "18px",
