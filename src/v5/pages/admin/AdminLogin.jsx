@@ -13,7 +13,7 @@ export default function AdminLogin() {
   useEffect(() => {
     getAdminSession().then((session) => {
       if (session) {
-        navigate("/admin/publications", { replace: true });
+        navigate("/t3b-manage-portal/publications", { replace: true });
       }
     });
   }, [navigate]);
@@ -25,7 +25,7 @@ export default function AdminLogin() {
 
     try {
       await adminLogin(email, password);
-      navigate("/admin/publications");
+      navigate("/t3b-manage-portal/publications");
     } catch (err) {
       setError(err.message || "Failed to log in. Please verify credentials.");
     } finally {

@@ -22,7 +22,7 @@ export default function PublicationList() {
   useEffect(() => {
     getAdminSession().then((session) => {
       if (!session) {
-        navigate("/admin/login", { replace: true });
+        navigate("/t3b-manage-portal/login", { replace: true });
       } else {
         setUser(session);
         loadPapers();
@@ -44,7 +44,7 @@ export default function PublicationList() {
 
   const handleLogout = async () => {
     await adminLogout();
-    navigate("/admin/login");
+    navigate("/t3b-manage-portal/login");
   };
 
   const handleToggle = async (paper) => {
@@ -133,21 +133,21 @@ export default function PublicationList() {
           {/* Admin Navigation Tabs */}
           <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "1px solid var(--line)", paddingBottom: "12px", flexWrap: "wrap" }}>
             <Link
-              to="/admin/publications"
+              to="/t3b-manage-portal/publications"
               className="btn btn--dark"
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >
               📄 Scientific Publications
             </Link>
             <Link
-              to="/admin/checkout-settings"
+              to="/t3b-manage-portal/checkout-settings"
               className="btn btn--ghost"
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >
               💳 Checkout &amp; Payment Controls
             </Link>
             <Link
-              to="/admin/orders"
+              to="/t3b-manage-portal/orders"
               className="btn btn--ghost"
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >
@@ -176,7 +176,7 @@ export default function PublicationList() {
               <span className="admin-metric-card__lbl">Unpublished Drafts</span>
             </div>
             <div className="admin-metric-card admin-metric-card--action">
-              <Link to="/admin/publications/new" className="btn btn--leaf admin-add-btn">
+              <Link to="/t3b-manage-portal/publications/new" className="btn btn--leaf admin-add-btn">
                 + Add New Publication
               </Link>
             </div>
@@ -309,7 +309,7 @@ export default function PublicationList() {
                             </Link>
                           )}
                           <Link
-                            to={`/admin/publications/edit/${paper.id}`}
+                            to={`/t3b-manage-portal/publications/edit/${paper.id}`}
                             className="admin-action-btn admin-action-btn--edit"
                             title="Edit Publication"
                           >
