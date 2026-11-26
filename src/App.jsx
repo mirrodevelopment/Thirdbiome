@@ -76,14 +76,14 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
 
-        {/* publication admin cms */}
-        <Route path="/admin" element={<Navigate to="/admin/publications" replace />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/publications" element={<PublicationList />} />
-        <Route path="/admin/publications/new" element={<PublicationEditor />} />
-        <Route path="/admin/publications/edit/:id" element={<PublicationEditor />} />
-        <Route path="/admin/checkout-settings" element={<CheckoutSettings />} />
-        <Route path="/admin/orders" element={<OrderList />} />
+        {/* private management portal */}
+        <Route path="/t3b-manage-portal" element={<Navigate to="/t3b-manage-portal/publications" replace />} />
+        <Route path="/t3b-manage-portal/login" element={<AdminLogin />} />
+        <Route path="/t3b-manage-portal/publications" element={<PublicationList />} />
+        <Route path="/t3b-manage-portal/publications/new" element={<PublicationEditor />} />
+        <Route path="/t3b-manage-portal/publications/edit/:id" element={<PublicationEditor />} />
+        <Route path="/t3b-manage-portal/checkout-settings" element={<CheckoutSettings />} />
+        <Route path="/t3b-manage-portal/orders" element={<OrderList />} />
 
         <Route path="*" element={<NotFound />} />
       </Route>

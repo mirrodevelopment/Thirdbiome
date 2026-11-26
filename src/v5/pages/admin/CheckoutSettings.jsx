@@ -20,7 +20,7 @@ export default function CheckoutSettings() {
   useEffect(() => {
     getAdminSession().then((session) => {
       if (!session) {
-        navigate("/admin/login", { replace: true });
+        navigate("/t3b-manage-portal/login", { replace: true });
       } else {
         setUser(session);
         loadSettings();
@@ -42,7 +42,7 @@ export default function CheckoutSettings() {
 
   const handleLogout = async () => {
     await adminLogout();
-    navigate("/admin/login");
+    navigate("/t3b-manage-portal/login");
   };
 
   const showFlash = (msg) => {
@@ -111,21 +111,21 @@ export default function CheckoutSettings() {
           {/* Admin Navigation Tabs */}
           <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "1px solid var(--line)", paddingBottom: "12px", flexWrap: "wrap" }}>
             <Link
-              to="/admin/publications"
+              to="/t3b-manage-portal/publications"
               className="btn btn--ghost"
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >
               📄 Scientific Publications
             </Link>
             <Link
-              to="/admin/checkout-settings"
+              to="/t3b-manage-portal/checkout-settings"
               className="btn btn--dark"
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >
               💳 Checkout &amp; Payment Controls
             </Link>
             <Link
-              to="/admin/orders"
+              to="/t3b-manage-portal/orders"
               className="btn btn--ghost"
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >

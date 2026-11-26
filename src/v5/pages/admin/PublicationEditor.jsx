@@ -54,7 +54,7 @@ export default function PublicationEditor() {
   useEffect(() => {
     getAdminSession().then((session) => {
       if (!session) {
-        navigate("/admin/login", { replace: true });
+        navigate("/t3b-manage-portal/login", { replace: true });
         return;
       }
 
@@ -179,7 +179,7 @@ export default function PublicationEditor() {
       };
 
       await savePublication(payload);
-      navigate("/admin/publications");
+      navigate("/t3b-manage-portal/publications");
     } catch (err) {
       setError(err.message || "Failed to save publication.");
       setSaving(false);
@@ -208,7 +208,7 @@ export default function PublicationEditor() {
         <div className="wrap" style={{ maxWidth: "980px", margin: "0 auto" }}>
           {/* Top Breadcrumb & Heading */}
           <div className="admin-editor-head">
-            <Link to="/admin/publications" className="admin-back-link">
+            <Link to="/t3b-manage-portal/publications" className="admin-back-link">
               ← Back to All Publications
             </Link>
             <div style={{ marginTop: 12 }}>
@@ -577,7 +577,7 @@ export default function PublicationEditor() {
                 <button
                   type="button"
                   className="btn btn--white"
-                  onClick={() => navigate("/admin/publications")}
+                  onClick={() => navigate("/t3b-manage-portal/publications")}
                   disabled={saving}
                 >
                   Cancel
