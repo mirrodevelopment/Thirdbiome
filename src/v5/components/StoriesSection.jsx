@@ -103,7 +103,7 @@ function ReelCard({ story, onSelect }) {
           muted
           playsInline
           loop
-          preload="metadata"
+          preload="none"
           className="v5-story-card__reel-video"
         />
 

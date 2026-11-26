@@ -29,6 +29,7 @@ import AdminLogin from "./v5/pages/admin/AdminLogin";
 import PublicationList from "./v5/pages/admin/PublicationList";
 import PublicationEditor from "./v5/pages/admin/PublicationEditor";
 import CheckoutSettings from "./v5/pages/admin/CheckoutSettings";
+import OrderList from "./v5/pages/admin/OrderList";
 
 function App() {
   return (
@@ -82,6 +83,7 @@ function App() {
         <Route path="/admin/publications/new" element={<PublicationEditor />} />
         <Route path="/admin/publications/edit/:id" element={<PublicationEditor />} />
         <Route path="/admin/checkout-settings" element={<CheckoutSettings />} />
+        <Route path="/admin/orders" element={<OrderList />} />
 
         <Route path="*" element={<NotFound />} />
       </Route>

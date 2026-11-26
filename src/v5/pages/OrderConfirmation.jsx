@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Arr } from "../components/ui";
 import Seo from "../components/Seo";
-import { getOrderByNumber } from "../../services/orderService";
+import { getOrderByNumber, getOrderDetails } from "../../services/orderService";
 import { payuService } from "../../services/paymentService";
 import { showToast } from "../../utils/toast";
 
@@ -51,8 +51,58 @@ export default function OrderConfirmation() {
         }
         // Get guest email from query param if present
         const guestEmail = params.get("email");
-        const response = await getOrderByNumber(orderNumber, guestEmail);
-        if (!cancelled) setOrder(response.data);
+        let resolvedOrder = null;
+
+        // 1. Try fetching by orderNumber
+        try {
+          const response = await getOrderByNumber(orderNumber, guestEmail);
+          resolvedOrder = response?.data?.order || response?.data || response?.order || null;
+        } catch { /* try fallback */ }
+
+        // 2. Fallback: try fetching by ID in case URL param is an orderId
+        if (!resolvedOrder) {
+          try {
+            const idRes = await getOrderDetails(orderNumber, guestEmail);
+            resolvedOrder = idRes?.data?.order || idRes?.data || idRes?.order || null;
+          } catch { /* try local fallback */ }
+        }
+
+        // 3. Fallback: use router state or sessionStorage order data saved during checkout
+        if (!resolvedOrder) {
+          if (location.state?.order) {
+            resolvedOrder = location.state.order;
+          } else {
+            try {
+              const saved = sessionStorage.getItem("lastOrderData");
+              if (saved) {
+                const parsed = JSON.parse(saved);
+                if (
+                  String(parsed.orderNumber) === String(orderNumber) ||
+                  String(parsed.id) === String(orderNumber)
+                ) {
+                  resolvedOrder = parsed;
+                }
+              }
+            } catch { /* ignore */ }
+          }
+        }
+
+        if (resolvedOrder) {
+          if (typeof resolvedOrder.items === "string") {
+            try {
+              resolvedOrder.items = JSON.parse(resolvedOrder.items);
+            } catch {
+              resolvedOrder.items = [];
+            }
+          }
+          if (!Array.isArray(resolvedOrder.items)) {
+            resolvedOrder.items = [];
+          }
+          if (!cancelled) setOrder(resolvedOrder);
+        } else if (!cancelled) {
+          setError("Failed to load order details");
+          showToast.error("Failed to load order details");
+        }
       } catch (err) {
         if (!cancelled) {
           setError("Failed to load order details");
