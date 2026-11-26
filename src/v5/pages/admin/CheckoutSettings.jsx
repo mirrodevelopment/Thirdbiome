@@ -109,7 +109,7 @@ export default function CheckoutSettings() {
           </div>
 
           {/* Admin Navigation Tabs */}
-          <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "1px solid var(--line)", paddingBottom: "12px" }}>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "1px solid var(--line)", paddingBottom: "12px", flexWrap: "wrap" }}>
             <Link
               to="/admin/publications"
               className="btn btn--ghost"
@@ -123,6 +123,13 @@ export default function CheckoutSettings() {
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >
               💳 Checkout &amp; Payment Controls
+            </Link>
+            <Link
+              to="/admin/orders"
+              className="btn btn--ghost"
+              style={{ fontSize: "0.88rem", padding: "8px 18px" }}
+            >
+              📦 Order Management
             </Link>
           </div>
 
@@ -276,6 +283,50 @@ export default function CheckoutSettings() {
                     />
                     <small style={{ color: "var(--ink-soft)", fontSize: "0.78rem" }}>
                       Displayed to customers on the checkout page when Cash on Delivery is selected.
+                    </small>
+                  </div>
+                </section>
+
+                <section className="admin-form-section" style={{ borderTop: "1px solid var(--line)", paddingTop: "24px", marginBottom: "28px" }}>
+                  <div className="admin-form-section__header" style={{ marginBottom: "16px" }}>
+                    <span className="admin-section-badge">04 · Internal Email Notifications</span>
+                    <h3 style={{ fontSize: "1.25rem", margin: "8px 0 4px" }}>Automated COD Order Alerts</h3>
+                    <p style={{ fontSize: "0.88rem", color: "var(--ink-soft)", margin: 0 }}>
+                      Automatically dispatch an internal email notification whenever a customer places a Cash on Delivery order.
+                    </p>
+                  </div>
+
+                  <div style={{ padding: "16px", background: "var(--panel)", borderRadius: "14px", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "18px" }}>
+                    <div>
+                      <strong style={{ fontSize: "1rem", display: "block" }}>Enable Internal COD Email Alerts</strong>
+                      <span style={{ fontSize: "0.85rem", color: "var(--ink-soft)" }}>
+                        Sends an email with order details and amount to collect via Laravel Mail / SMTP.
+                      </span>
+                    </div>
+                    <label style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        name="enableCodEmailNotification"
+                        checked={Boolean(settings.enableCodEmailNotification)}
+                        onChange={handleChange}
+                        style={{ width: "22px", height: "22px", accentColor: "var(--green-d)" }}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label htmlFor="codNotificationRecipient">Notification Recipient Email</label>
+                    <input
+                      id="codNotificationRecipient"
+                      type="email"
+                      name="codNotificationRecipient"
+                      value={settings.codNotificationRecipient || ""}
+                      onChange={handleChange}
+                      className="v5-input"
+                      placeholder="Info@aeobiome.com"
+                    />
+                    <small style={{ color: "var(--ink-soft)", fontSize: "0.78rem" }}>
+                      Internal email address that receives new COD order alerts (default: Info@aeobiome.com).
                     </small>
                   </div>
                 </section>

@@ -10,6 +10,8 @@ export const DEFAULT_CHECKOUT_SETTINGS = {
   maxCodAmount: 50000,
   codNotice: "Pay in cash or UPI at your doorstep when your package arrives.",
   codUnavailableNotice: "Cash on delivery is temporarily unavailable.",
+  enableCodEmailNotification: true,
+  codNotificationRecipient: "Info@aeobiome.com",
 };
 
 /**
@@ -34,6 +36,9 @@ export const getCheckoutSettings = async () => {
           maxCodAmount: Number(data.max_order_amount) || 50000,
           codNotice: data.cod_notice || DEFAULT_CHECKOUT_SETTINGS.codNotice,
           codUnavailableNotice: DEFAULT_CHECKOUT_SETTINGS.codUnavailableNotice,
+          enableCodEmailNotification: data.enable_cod_email_notification ?? true,
+          codNotificationRecipient:
+            data.cod_notification_recipient || DEFAULT_CHECKOUT_SETTINGS.codNotificationRecipient,
         };
         // Cache to local storage
         try {
@@ -85,6 +90,8 @@ export const saveCheckoutSettings = async (settings) => {
         min_order_amount: Number(merged.minCodAmount) || 0,
         max_order_amount: Number(merged.maxCodAmount) || 50000,
         cod_notice: String(merged.codNotice || ""),
+        enable_cod_email_notification: Boolean(merged.enableCodEmailNotification),
+        cod_notification_recipient: String(merged.codNotificationRecipient || "Info@aeobiome.com"),
         updated_at: new Date().toISOString(),
       };
 

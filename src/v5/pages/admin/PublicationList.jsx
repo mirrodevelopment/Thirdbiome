@@ -131,7 +131,7 @@ export default function PublicationList() {
           </div>
 
           {/* Admin Navigation Tabs */}
-          <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "1px solid var(--line)", paddingBottom: "12px" }}>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "24px", borderBottom: "1px solid var(--line)", paddingBottom: "12px", flexWrap: "wrap" }}>
             <Link
               to="/admin/publications"
               className="btn btn--dark"
@@ -145,6 +145,13 @@ export default function PublicationList() {
               style={{ fontSize: "0.88rem", padding: "8px 18px" }}
             >
               💳 Checkout &amp; Payment Controls
+            </Link>
+            <Link
+              to="/admin/orders"
+              className="btn btn--ghost"
+              style={{ fontSize: "0.88rem", padding: "8px 18px" }}
+            >
+              📦 Order Management
             </Link>
           </div>
 

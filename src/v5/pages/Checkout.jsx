@@ -404,10 +404,18 @@ export default function Checkout() {
         });
 
         showToast.success("Order placed successfully with Cash on Delivery!");
+        const fallbackOrder = {
+          id: createdOrderId,
+          orderNumber: createdOrderNumber || createdOrderId,
+          ...orderData,
+          paymentStatus: "pending",
+          status: "confirmed",
+        };
         navigate(
           `/order-confirmation/${createdOrderNumber || createdOrderId}?method=cod&email=${encodeURIComponent(
             currentEmail
-          )}`
+          )}`,
+          { state: { order: fallbackOrder } }
         );
         return;
       }
